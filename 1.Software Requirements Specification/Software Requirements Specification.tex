@@ -56,7 +56,111 @@ Instructor needs to manage scores of all classes he/she takes. He/she should hav
 unrelated instructors.
 \subsubsection{Students}
 Student needs to view his/her scores on score manage system. Apart from that, student can not make any changes on scores committed by teachers. So, the differences between students and instructors should be considered into user authentication.
+\subsection{Scenarios}
+\subsubsection{Upload}
+\begin{itemize}
+\item Primary Actor: Instructor
+\item Goal in Context: Upload the scores of one class
+\item Precondition: The computer is online and  the transcript is finished
+\item Trigger: Press on the UPLOAD button in system
+\item Scenario: 
+\begin{enumerate}
+\item Enter the page for managing scores;
+\item Select one class;
+\item Press the UPLOAD button;
+\item Download the transcript template;
+\item Fill the transcript;
+\item Upload the file.
+\end{enumerate}
+\item Exception:
+\begin{enumerate}
+\item The transcript's format does not accord to the standard;
+\item The file is too large;
+\item There already exists one file.
+\end{enumerate}
+\item Priority: Obligatory
+\item Frequency: Often
+\item Usage Mode: Through browser
+\end{itemize}
+\subsubsection{Commit}
+\begin{itemize}
+\item Primary Actor: Instructor
+\item Goal in Context: Confirm the scores of one class and save them in the stable database
+\item Precondition: After uploading
+\item Trigger: Press on the COMMIT button in system
+\item Scenario: 
+\begin{enumerate}
+\item Enter the page for managing scores;
+\item Select one class;
+\item Press the COMMIT button;
+\item Click on OK.
+\end{enumerate}
+\item Exception:
+\begin{enumerate}
+\item A parallel MODIFY method is open
+\item There is no file existing for the class.
+\end{enumerate}
+\item Priority: Obligatory
+\item Frequency: Often
+\item Usage Mode: Through browser
+\end{itemize}
 
+\subsubsection{Modify}
+\begin{itemize}
+\item Primary Actor: Instructor
+\item Goal in Context: Modify the scores of one particular class
+Precondition: After uploading
+\item Trigger: Press on the MODIFY button in system
+\item Scenario:
+
+\emph{Before commit}
+\begin{enumerate}
+\item Press on the MODIFY button;
+\item Modify on the online table;
+\item Save.
+\end{enumerate}
+\emph{After commit}
+\begin{enumerate}
+\item Press on the MODIFY button;
+\item Download an application form;
+\item Fill the application form;
+\item Upload the form;
+\item Broadcast the request for amendment;
+\item Wait.
+\end{enumerate}
+\item Exception:
+\begin{enumerate}
+\item Fail to send the request;
+\item The format of the form doesn’t accord to its standard.
+\item Accidentally quit.
+Priority:Obligatory
+Frequency:Often
+Usage Mode:Through browser
+\end{enumerate}
+\end{itemize}
+
+\subsubsection{Query}
+\begin{itemize}
+\item Primary Actor: Instructor/Student
+\item Goal in Context: Query the statistical information of scores
+\item Precondition: After uploading / committing
+\item Trigger: Press VIEW SCORE button
+\item Scenario:
+\begin{enumerate}
+\item Press VIEW SCORE button;
+\item Select view mode.
+\end{enumerate}
+\item Exception:
+\begin{enumerate}
+\item The instructor hasn’t uploaded scores;
+\item The instructor hasn’t committed scores;
+\end{enumerate}
+
+\item Priority: Obligatory
+\item Frequency: Often
+\item Usage Mode:Through browser
+\end{itemize}
+\subsection{Scenario Graph}
 \includegraphics[width=5in]{pic/1.png}
 \subsection{Data Flow Diagram}
 \subsubsection{Overview}

@@ -50,14 +50,25 @@ The system aims to provide a service that helps the faculties and school adminis
 \section{Description}
 
 \subsection{User Scenarios}
-\subsection{User Requirements}
-\subsubsection{Instructors}
+\subsubsection{User Requirements}
+\begin{itemize}
+\item
+
+\emph{Instructors}
+
 Instructor needs to manage scores of all classes he/she takes. He/she should have access to upload new scores and look up/modify the committed scores. And instructor should be given proper right to access his/her own classes' scores and insulate them from other
 unrelated instructors.
-\subsubsection{Students}
+
+\item\emph{Students}
+
 Student needs to view his/her scores on score manage system. Apart from that, student can not make any changes on scores committed by teachers. So, the differences between students and instructors should be considered into user authentication.
-\subsection{Scenarios}
-\subsubsection{Upload}
+\end{itemize}
+\subsubsection{Scenarios}
+\begin{itemize}
+
+
+\item Upload
+
 \begin{itemize}
 \item Primary Actor: Instructor
 \item Goal in Context: Upload the scores of one class
@@ -82,7 +93,10 @@ Student needs to view his/her scores on score manage system. Apart from that, st
 \item Frequency: Often
 \item Usage Mode: Through browser
 \end{itemize}
-\subsubsection{Commit}
+
+
+\item Commit
+
 \begin{itemize}
 \item Primary Actor: Instructor
 \item Goal in Context: Confirm the scores of one class and save them in the stable database
@@ -105,7 +119,7 @@ Student needs to view his/her scores on score manage system. Apart from that, st
 \item Usage Mode: Through browser
 \end{itemize}
 
-\subsubsection{Modify}
+\item Modify
 \begin{itemize}
 \item Primary Actor: Instructor
 \item Goal in Context: Modify the scores of one particular class
@@ -139,7 +153,7 @@ Usage Mode:Through browser
 \end{enumerate}
 \end{itemize}
 
-\subsubsection{Query}
+\item Query
 \begin{itemize}
 \item Primary Actor: Instructor/Student
 \item Goal in Context: Query the statistical information of scores
@@ -160,7 +174,8 @@ Usage Mode:Through browser
 \item Frequency: Often
 \item Usage Mode:Through browser
 \end{itemize}
-\subsection{Scenario Graph}
+\end{itemize}
+\subsubsection{Scenario Graph}
 \includegraphics[width=5in]{pic/1.png}
 \subsection{Data Flow Diagram}
 \subsubsection{Overview}

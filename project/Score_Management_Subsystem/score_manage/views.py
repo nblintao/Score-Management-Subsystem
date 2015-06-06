@@ -7,6 +7,6 @@ def index(request):
 	#Add icons to upload/scan specific course 
 	return HttpResponse("Manage Index")
 
-def preview(request)
+def preview(request):
 	return HttpResponse("Display temp score")
 

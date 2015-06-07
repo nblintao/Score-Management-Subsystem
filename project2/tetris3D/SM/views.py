@@ -40,12 +40,26 @@ def B_student_query(request, student_id):
     'gradePoint':4.2
     },
     {
+    'courseID':'111111',
+    'courseName':'哈哈哈',
+    'score':87,
+    'credit':1,
+    'gradePoint':4.2
+    },
+    {
     'courseID':'1111331',
     'courseName':'喂喂喂',
     'score':77,
     'credit':1,
     'gradePoint':3.2
-    }    
+    },
+    {
+    'courseID':'1111331',
+    'courseName':'喂喂喂',
+    'score':67,
+    'credit':1,
+    'gradePoint':2.2
+    },      
     ]
 
     return HttpResponse(json.dumps(scores), content_type="application/json")

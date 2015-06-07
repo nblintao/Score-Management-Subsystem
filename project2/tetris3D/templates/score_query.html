@@ -6,34 +6,71 @@
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
     <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/d3.min.js"></script>
 </head>
 <body>
 <div class="container-fluid">
     <ul class="nav nav-tabs">
-      <li role="presentation" class="active"><a href="#">成绩查询</a></li>
-      <li role="presentation"><a href="#">成绩登记</a></li>
-      <li role="presentation"><a href="#">成绩修改</a></li>
+      <li role="presentation" class="active"><a href="/SM/query">成绩查询</a></li>
+      <li role="presentation"><a href="/SM/commit">成绩登记</a></li>
+      <li role="presentation"><a href="/SM/modification">成绩修改</a></li>
     </ul>
     <div class="row">
         <div class="col-md-7">
-            <table class="table table-hover">
-                <tr>
-                    <th>选课课号</th>
-                    <th>课程名称</th>
-                    <th>成绩</th>
-                    <th>学分</th>
-                    <th>绩点</th>
-                </tr>
-                <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
-                    <td>户外拓展</td>
-                    <td>87</td>
-                    <td>1.0</td>
-                    <td>4.20</td>
-                </tr>
+            <table class="table table-hover" >
+                <thead>
+                    <tr>
+                        <th>选课课号</th>
+                        <th>课程名称</th>
+                        <th>成绩</th>
+                        <th>学分</th>
+                        <th>绩点</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreTable">
+                    <tr>
+                        <td>(2012-2013-2)-04810020-0096419-1</td>
+                        <td>户外拓展</td>
+                        <td>87</td>
+                        <td>1.0</td>
+                        <td>4.20</td>
+                    </tr>
+                    <tr>
+                        <td>(2012-2013-2)-04810020-0096419-1</td>
+                        <td>户外拓展</td>
+                        <td>87</td>
+                        <td>1.0</td>
+                        <td>4.20</td>
+                    </tr>
+                </div>
             </table>
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    d3.json('/SM/B_student_query/3120000066',function(data){
+        resetTable();
+        updateTable(data);
+    })
+
+function resetTable() {
+    d3.select("#scoreTable").selectAll("tr").remove();
+}
+
+function updateTable(data) {
+    d3.select("#scoreTable").selectAll("tr")
+        .data(data)
+        .enter().append("tr")
+        .html(function (d) {
+        str = '';
+        str += "<td>" + d.courseID + "</td>";
+        str += "<td>" + d.courseName + "</td>";
+        str += "<td>" + d.score + "</td>";
+        str += "<td>" + d.credit + "</td>";
+        str += "<td>" + d.gradePoint + "</td>";
+        return str;
+    });
+}
+</script>
 </body>
 </html>

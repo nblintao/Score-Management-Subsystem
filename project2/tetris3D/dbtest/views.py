@@ -107,4 +107,22 @@ def class_info_query(c_id):
     return namelist
 
 
+def temp_table_update(c_id, score_list):
+    for pair in score_list:
+        print(pair.score)
+        try:
+            tmp_rec = TempTable.objects.get(class_id=c_id, student_id=pair.studentID)
+            tmp_rec.score = pair.score
+            tmp_rec.save()
+        except:
+            s_id_instance = Student_user.objecs.get(id=pair.studentID)
+            c_id_instance = Class_info.objects.get(class_id=c_id)
+            TempTable.objects.create(student_id=s_id_instance,
+                                     class_id=c_id_instance,
+                                     score=pair.score)
+
+
+
+
+
 

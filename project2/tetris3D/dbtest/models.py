@@ -92,7 +92,7 @@ class class_table(models.Model):
 
 
 class TempTable(models.Model):
-    faculty_id = models.ForeignKey(Faculty_user)
+    # faculty_id = models.ForeignKey(Faculty_user)
     student_id = models.ForeignKey(Student_user)
     class_id = models.ForeignKey(Class_info)
     """ the above three should be modified to ForeignKey
@@ -102,7 +102,7 @@ class TempTable(models.Model):
     score = models.FloatField()
 
     class Meta:
-        ordering = ["faculty_id"]
+        ordering = ["class_id"]
 
     def __str__(self):
         return 'score of student %s in class %s' \

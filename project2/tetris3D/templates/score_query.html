@@ -84,7 +84,8 @@
     </div>
 </div>
 <script type="text/javascript">
-    d3.json('/SM/B_student_query/3120000066',function(data){
+//TODO
+    d3.json('/SM/B_student_query/0000000001',function(data){
         var values = data.map(function(d){return d.score;});
         updateTable(data);
         drawHisto(values);

@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dbtest',
+    'SM',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -102,4 +102,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-WEBSOCKET_URL = '/ws/'
+# WEBSOCKET_URL = '/ws/'

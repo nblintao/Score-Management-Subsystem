@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Context, loader
 import json
+from dbtest.models import ScoreTable, TempTable, MessageTable, Course_info, Class_info
 
 # Create your views here.
 
@@ -30,8 +31,25 @@ def score_modification(request):
 def B_student_query(request, student_id):
     print(request.session)
     print(student_id)
+    scores = []
+    ret = ScoreTable.objects.filter(student_id=student_id)
 
-    scores=[
+    for stu in ret:
+        tmp_score = stu.score
+        tmp_class = stu.class_id
+        if tmp_score < 60:
+            tmp_gpa = 0
+        else:
+            tmp_gpa = (tmp_score - 60) / 10 + 1.5
+        tmp_node = {'courseID': tmp_class.course_id.course_id,
+                    'courseName': tmp_class.course_id.name,
+                    'credit': tmp_class.course_id.credits,
+                    'score': tmp_score,
+                    'gradePoint': tmp_gpa, }
+        scores.append(tmp_node)
+
+    '''
+    scores = [
     {
     'courseID':'111111',
     'courseName':'哈哈哈',
@@ -61,5 +79,6 @@ def B_student_query(request, student_id):
     'gradePoint':2.2
     },      
     ]
-
+    '''
+    print(scores)
     return HttpResponse(json.dumps(scores), content_type="application/json")

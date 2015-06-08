@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
     <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/d3.min.js"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -89,9 +90,10 @@
                     <th>选课课号</th>
                     <th>课程名称</th>
                     <th>学分</th>
+                    <th>上课时间</th>
                     <th>修改</th>
                 </tr>
-                <tr>
+<!--                 <tr>
                     <td>(2012-2013-2)-04810020-0096419-1</td>
                     <td>英语口语</td>
                     <td>1.0</td>
@@ -102,20 +104,23 @@
                     <td>英语写作</td>
                     <td>2.0</td>
                     <td><button class="btn btn-default btn-sm">修改此课</button></td>
-                </tr>
+                </tr> -->
+                <tbody id = "infoTable"></tbody>
             </table>
             <h3>该课程统计信息</h3>
             <table class="table">
                 <thead>
-                    <tr><th>总学分</th>
-                    <th>平均绩点</th>
-                    <th>最低分</th>
-                    <th>最高分</th>
-                    <th>平均分</th>
-                    <th>中位数</th>
-                    <th>方差</th>
-                </tr></thead>
-                <tbody id="infoTable"><tr><td>4.00</td><td>79.50</td><td>67.00</td><td>87.00</td><td>79.50</td><td>82.00</td><td>91.67</td></tr></tbody>
+                    <tr>
+                        <th>平均分</th>
+                        <th>最低分</th>
+                        <th>最高分</th>
+                        <th>中位数</th>
+                        <th>方差</th>
+                    </tr>
+                </thead>
+                <tbody id="statInfo"></tbody>
+<!--                 <tbody id="infoTable"><tr><td>4.00</td><td>79.50</td><td>67.00</td><td>87.00</td><td>79.50</td><td>82.00</td><td>91.67</td></tr></tbody>
+ -->       
             </table>
 
             <h3>选择要修改的成绩</h3>
@@ -127,7 +132,8 @@
                     <th>绩点</th>
                     <th>修改</th>
                 </tr>
-                <tr>
+                <tbody id = "studentScore"></tbody>
+<!--                 <tr>
                     <td>3120000001</td>
                     <td>张三</td>
                     <td>87</td>
@@ -140,47 +146,164 @@
                     <td>88</td>
                     <td>4.30</td>
                     <td><button class="btn btn-default btn-sm">修改此成绩</button></td>
-                </tr>                
+                </tr>   -->              
             </table>            
         </div>
         <div class="col-md-4">
         <div class="panel panel-default">
             <div class="panel-heading">成绩修改表</div>
             <div class="panel-body">
-                <form>
-                  <div class="form-group">
-                    <label for="InputCourseID">选课课号</label>
-                    <input type="text" class="form-control" id="InputCourseID" readonly="readonly" value="(2012-2013-2)-04810020-0094359-1">
-                  </div>
-                  <div class="form-group">
-                    <label for="InputCourseName">课程名称</label>
-                    <input type="text" class="form-control" id="InputCourseName" readonly="readonly" value="英语写作">
-                  </div>
-                  <div class="form-group">
-                    <label for="InputStudentID">学生学号</label>
-                    <input type="text" class="form-control" id="InputStudentID" readonly="readonly" value="3120000001">
-                  </div>                  
-                  <div class="form-group">
-                    <label for="InputStudentName">学生姓名</label>
-                    <input type="text" class="form-control" id="InputStudentName" readonly="readonly" value="张三">
-                  </div>
-                  <div class="form-group">
-                    <label for="InputOldScore">原成绩</label>
-                    <input type="text" class="form-control" id="InputOldScore" readonly="readonly" value="87">
-                  </div>
-                  <div class="form-group">
-                    <label for="InputNewScore">新成绩</label>
-                    <input type="text" class="form-control" id="InputNewScore">
-                  </div>
-                  <div class="form-group">
-                    <label for="InputNewScore">理由</label>
-                    <input type="text" class="form-control" id="InputNewScore">
-                  </div>
-                  <button type="submit" class="btn btn-default">提交修改</button>
+                <!-- TODO 送到哪啊= = -->
+                <form id="requestForm" method="post">
+                    <div class="form-group" id="InputCourseID">
+                        <label for="InputCourseID">选课课号</label>
+                        <input type="text" class="form-control" readonly="readonly" value="">
+                    </div>
+                    <div class="form-group" id="InputCourseName" >
+                        <label for="InputCourseName">课程名称</label>
+                        <input type="text" class="form-control"readonly="readonly" value="">
+                    </div>
+                    <div class="form-group" id="InputStudentID">
+                        <label for="InputStudentID">学生学号</label>
+                        <input type="text" class="form-control"readonly="readonly" value="">
+                    </div>                  
+                    <div class="form-group" id="InputStudentName">
+                        <label for="InputStudentName">学生姓名</label>
+                        <input type="text" class="form-control"readonly="readonly" value="">
+                    </div>
+                    <div class="form-group" id="InputOldScore">
+                        <label for="InputOldScore">原成绩</label>
+                        <input type="text" class="form-control"readonly="readonly" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="InputNewScore">新成绩</label>
+                        <input type="text" class="form-control" id="InputNewScore">
+                    </div>
+                    <div class="form-group">
+                        <label for="InputNewScore">理由</label>
+                        <input type="text" class="form-control" id="InputNewScore">
+                    </div>
+
+                    <button type="submit" class="btn btn-default" value="submit">提交修改</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    d3.json('/SM/B_teacher_query/000001',function(data){
+     // console.log(data);
+        coursesInfo = data;
+        updateInfoTable(data);
+    });
+
+var coursesInfo;
+var studentScore;
+
+function updateInfoTable(data){
+
+    d3.select("#infoTable").selectAll("tr").remove();
+    d3.select("#infoTable").selectAll("tr")
+        .data(data)
+        .enter().append("tr")
+        .html(function(d){
+            str = '';
+            str += "<td>" + d.courseID + "</td>";
+            str += "<td>" + d.courseName + "</td>";
+            str += "<td>" + d.credits + "</td>";
+            str += "<td>" + d.classTime + "</td>";
+            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\')">' + "修改此课" + "</button></td>";
+            return str;
+        });
+}
+
+function updateClassScore(classID){
+
+    console.log(classID);
+    d3.json("/SM/B_temp_table_query/"+classID,function(data){
+        // console.log(data);
+        d3.select("#studentScore").selectAll("tr").remove();
+        d3.select("#studentScore").selectAll("tr")
+            .data(data)
+            .enter().append("tr")
+            .html(function (d) {
+            str = '';
+            str += "<td>" + d.studentID + "</td>";
+            str += "<td>" + d.studentName + "</td>";
+            str += "<td>" + d.score + "</td>";
+            str += "<td>" + d.gradePoint + "</td>";
+            str += '<td><button class="btn btn-default btn-sm" onclick="createForm(\'' + classID + '\' , \'' + d.studentID + '\')">修改此成绩</button></td>';
+            return str;
+        });
+        studentScore = data;
+        updateStatInfo(data);
+    })
+}
+
+function updateStatInfo(data){
+    var stat = [];
+    var values = data.map(function(d){return d.score;});
+    // 平均分
+    stat[0] = d3.mean(values);
+    // 最低分
+    stat[1] = d3.min(values);
+    // 最高分
+    stat[2] = d3.max(values);
+    stat[3] = d3.median(values);
+    stat[4] = d3.variance(values);
+
+    d3.select("#statInfo").selectAll("tr").remove();
+    d3.select("#statInfo").selectAll("tr")
+        .data([stat])
+        .enter().append("tr")
+        .html(function (d) {
+        str = d.map(function(d){return "<td>" + d.toFixed(2) + "</td>";}).join('')
+        return str;
+    });
+}
+
+function createForm(classID, studentID){
+    
+    console.log(classID);
+    console.log(studentID);
+    
+    console.log(studentScore);
+    console.log(coursesInfo);
+    var form = [];
+
+    var i;
+    var cTmp;
+    for (i = coursesInfo.length - 1; i >= 0; i--) {
+        cTmp = coursesInfo[i];
+        if(cTmp.classID == classID)
+            break;
+    }
+    form[0] = coursesInfo[i].courseID;
+    form[1] = coursesInfo[i].courseName;
+
+    var sTmp;
+    for (i = studentScore.length - 1; i >= 0; i--) {
+        sTmp = studentScore[i];
+        if(sTmp.studentID == studentID)
+            break;
+    }
+    form[2] = studentScore[i].studentID;
+    form[3] = studentScore[i].studentName;
+    form[4] = studentScore[i].score;
+
+    console.log([form]);
+
+    document.getElementById('InputCourseID').innerHTML = '<label for="InputCourseID">选课课号</label><input type="text" class="form-control" readonly="readonly" value="' + form[0] + '">';
+    document.getElementById('InputCourseName').innerHTML = '<label for="InputCourseName">课程名称</label><input type="text" class="form-control"readonly="readonly" value="' + form[1] + '">';
+    document.getElementById('InputStudentID').innerHTML = '<label for="InputStudentID">学生学号</label><input type="text" class="form-control"readonly="readonly" value="' + form[2] + '">';
+    document.getElementById('InputStudentName').innerHTML = '<label for="InputStudentName">学生姓名</label><input type="text" class="form-control"readonly="readonly" value="' + form[3] + '">';
+    document.getElementById('InputOldScore').innerHTML = '<label for="InputOldScore">原成绩</label><input type="text" class="form-control"readonly="readonly" value="' + form[4] + '">';
+        
+}
+
+</script>
+
 </body>
 </html>

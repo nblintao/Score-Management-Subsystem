@@ -107,6 +107,7 @@ def class_info_query(c_id):
         namelist.append(tmp_node)
     return namelist
 
+
 def b_temp_table_query(request, c_id):
     """
 
@@ -155,8 +156,10 @@ def temp_table_update(c_id, score_list):
                                      class_id=c_id_instance,
                                      score=pair['score'])
 
-def B_teacher_query(request, teacher_id):
+
+def b_teacher_query(request, teacher_id):
     return HttpResponse(json.dumps(faculty_class_query(teacher_id)), content_type="application/json")
+
 
 def faculty_class_query(f_id):
     """

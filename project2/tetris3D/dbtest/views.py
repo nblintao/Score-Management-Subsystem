@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Context, loader
-import json
-from dbtest.models import   ScoreTable, TempTable, MessageTable,    \
+from .models import   ScoreTable, TempTable, MessageTable,    \
                             Course_info, Class_info, class_table,   \
                             Student_user
+import json
+
 
 
 # Create your views here.
@@ -94,7 +95,7 @@ def B_student_query(request, student_id):
 def class_info_query(c_id):
     """
     :param c_id: Class id
-    :return: List of student name and id
+    :return: List of student info, in form of {'studentID': '0000000001', 'studentName': 'john'}
     """
     tmp_cla = class_table.objects.filter(class_id=c_id)
     namelist = []
@@ -108,18 +109,28 @@ def class_info_query(c_id):
 
 
 def temp_table_update(c_id, score_list):
+    """
+    To update the temptable
+    :param c_id: class id
+    :param score_list: in form of {'studentID': '0000000001', 'score': 100}
+    :return:
+    """
+    print(c_id)
+    print(score_list)
+    print('hahaha')
+    print(len(score_list))
     for pair in score_list:
-        print(pair.score)
+        print(pair['score'])
         try:
-            tmp_rec = TempTable.objects.get(class_id=c_id, student_id=pair.studentID)
-            tmp_rec.score = pair.score
+            tmp_rec = TempTable.objects.get(class_id=c_id, student_id=pair['studentID'])
+            tmp_rec.score = pair['score']
             tmp_rec.save()
         except:
-            s_id_instance = Student_user.objecs.get(id=pair.studentID)
+            s_id_instance = Student_user.objects.get(id=pair['studentID'])
             c_id_instance = Class_info.objects.get(class_id=c_id)
             TempTable.objects.create(student_id=s_id_instance,
                                      class_id=c_id_instance,
-                                     score=pair.score)
+                                     score=pair['score'])
 
 
 

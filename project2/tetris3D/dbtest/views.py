@@ -5,29 +5,63 @@ from .models import ScoreTable, TempTable, MessageTable, \
     Course_info, Class_info, class_table, \
     Student_user, Faculty_user
 import json
-
+#User Authentication
+from .forms import NameForm
+from django.template.context import RequestContext
+from django.template import Context
+from django.template import Template
+from django.http import HttpResponseRedirect
+from django.template.context_processors import csrf
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
+from django.contrib.auth import logout
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group,Permission
+from django.views.decorators.csrf import csrf_protect
+###
 
 
 # Create your views here.
 def score_login(request):
-    print(request.method)
-    if request.method == 'GET':
-        t = loader.get_template('score_login.html')
-        return HttpResponse(t.render())
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = NameForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            user = authenticate(username = request.POST['name'],password = request.POST['password'])
+            if user is not None:
+                if user.is_active:
+                    #should be changed into /SM/index
+                    login(request, user)
+                    return HttpResponseRedirect('/SM/query')
+                else:
+                    return HttpResponseRedirect('/SM/login')
+            else:
+                return HttpResponseRedirect('/SM/login')
+
+    # if a GET (or any other method) we'll create a blank form
     else:
-        print("other")
+        form = NameForm()
+
+    return render(request, 'score_login.html', {'form': form})
 
 
 def score_query(request):
     t = loader.get_template('score_query.html')
     return HttpResponse(t.render())
 
-
+#you can use login_required to control access
+@login_required
 def score_commit(request):
     t = loader.get_template('score_commit.html')
     return HttpResponse(t.render())
 
-
+@login_required
 def score_modification(request):
     t = loader.get_template('score_modification.html')
     return HttpResponse(t.render())

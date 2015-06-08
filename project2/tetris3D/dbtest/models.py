@@ -114,7 +114,8 @@ class MessageTable(models.Model):
     to_faculty_id = models.ForeignKey(Faculty_user, related_name='%(class)s_to')
     student_id = models.ForeignKey(Student_user)
     class_id = models.ForeignKey(Class_info)
-    """ foreignkey again   """
+    score = models.FloatField()
+    reason = models.CharField(max_length=200)
     status = models.BooleanField(default=False)
 
     class Meta:

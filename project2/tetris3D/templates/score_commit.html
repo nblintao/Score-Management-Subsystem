@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-theme.min.css">
     <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/d3.min.js"></script>
 </head>
 <body>
 <div class="container-fluid">
@@ -17,10 +18,10 @@
     <div class="row">
         <div class="col-md-2">
             <h3>尚未提交的课程</h3>
-            <ul class="nav nav-pills nav-stacked">
-                  <li role="presentation" class="active"><a href="#">英语口语</a></li>
+            <ul class="nav nav-pills nav-stacked" id="courseList">
+<!--                   <li role="presentation" class="active"><a href="#">英语口语</a></li>
                   <li role="presentation"><a href="#">英语写作</a></li>
-                  <li role="presentation"><a href="#">英美文学</a></li>
+                  <li role="presentation"><a href="#">英美文学</a></li> -->
             </ul>
         </div>
         <div class="col-md-8">     
@@ -31,10 +32,10 @@
                     <th>课程名称</th>
                     <th>学分</th>
                 </tr>
-                <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
+                <tr id="infoTable">
+<!--                     <td>(2012-2013-2)-04810020-0096419-1</td>
                     <td>英语口语</td>
-                    <td>1.0</td>
+                    <td>1.0</td> -->
                 </tr>
             </table>
 
@@ -42,13 +43,16 @@
             <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span>上传成绩单<input type="file" /></button>
             <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>正式提交</button>    
             <table class="table table-hover">
+                <thead>
                 <tr>
                     <th>学号</th>
                     <th>姓名</th>
                     <th>成绩</th>
                     <th>绩点</th>
                 </tr>
-                <tr>
+                </thead>
+                <tbody id="studentTable">
+<!--                 <tr>
                     <td>3120000001</td>
                     <td>张三</td>
                     <td>87</td>
@@ -59,7 +63,8 @@
                     <td>李四</td>
                     <td>88</td>
                     <td>4.30</td>
-                </tr>                
+                </tr> -->
+                </tbody>                
             </table>            
         </div>
     </div>
@@ -67,8 +72,71 @@
 <script type="text/javascript">
     //TODO
     d3.json('/SM/B_teacher_query/000001',function(data){
-        
+        console.log(data);
+        courseInfo = data;
+        updateList(data);
+    });
+
+var courseInfo;
+var theCourseInfo;
+
+function updateList(data){
+    d3.select("#courseList").selectAll("li").remove();
+    d3.select("#courseList").selectAll("li")
+        .data(data)
+        .enter().append("li")
+        .attr("role","presentation")
+        .html(function(d){return '<a href="#" onclick="selectCourse(\'' + d.courseID +'\')">' + d.courseName + "</a>"});
+        // .html(function(d){return '<a href="#">' + d.courseName + "</a>"});
+    // var firstCourse = d3.select("#courseList").select("li")
+    // if(firstCourse.size() >= 1){
+    //     firstCourse.attr("class","active");
+    // }
+}
+
+function selectCourse(courseID){
+    // console.log(courseID);
+    var course;
+    for (var i = courseInfo.length - 1; i >= 0; i--) {
+        course = courseInfo[i];
+        if(course.courseID == courseID)
+            break;
+    }
+    if(i<0){
+        console.log("Cannot find the course");
+        return;
+    }
+    theCourseInfo = course;
+    updateInfoTable(course);
+    updateStudentTable(course.courseID);
+}
+
+function updateStudentTable(courseID){
+    // TODO
+    d3.json("/SM/B_temp_table_query/"+courseID,function(data){
+        // console.log(data);
+        d3.select("#studentTable").selectAll("tr").remove();
+        d3.select("#studentTable").selectAll("tr")
+            .data(data)
+            .enter().append("tr")
+            .html(function (d) {
+            str = '';
+            str += "<td>" + d.studentID + "</td>";
+            str += "<td>" + d.studentName + "</td>";
+            str += "<td>" + d.score + "</td>";
+            str += "<td>" + d.gradePoint + "</td>";
+            return str;
+        });
     })
+}
+
+function updateInfoTable(course){
+    d3.select("#infoTable").selectAll("td").remove();
+    d3.select("#infoTable").selectAll("td")
+        .data([course.courseID, course.courseName, course.credits])
+        .enter().append("td")
+        .text(function(d){return d});
+}
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 __author__ = 'Manfred'
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment
-from dbtest import views
+from dbtest.views import class_info_query, temp_table_update
 import random
 
 
@@ -36,7 +36,16 @@ def parse_xlsx(xlsx_filename):
     end_row = ws.get_highest_row()
     score_info = []
     for row in range(start_row, end_row + 1):
+        # print('processing row: {}'.format(row))
+        if ws['A{}'.format(row)].value is None :
+            break
+        if ws['B{}'.format(row)].value is None :
+            break
+        if ws['C{}'.format(row)].value is None :
+            break
+
         row_info = {'studentID': ws['A{}'.format(row)].value, 'score': float(ws['C{}'.format(row)].value)}
+        # print(row_info)
         score_info.append(row_info)
 
     return XlsxInfo(course_id, score_info)
@@ -49,7 +58,8 @@ def get_demo_xlsx(course_id='0000000001'):
 
     # todo: should get course id from front-end
     course_id = '0000000001'
-    student_info = views.class_info_query(course_id)
+    student_info = class_info_query(course_id)
+    # student_info = views.class_info_query(course_id)
 
 
     # Formatting
@@ -80,12 +90,13 @@ def get_demo_xlsx(course_id='0000000001'):
 
     # Save the file
     ws.page_setup.fitToWidth = 1
-    wb.save("sample.xlsx")
+    wb.save("./download/sample.xlsx")
 
 
 def update_score(xlsx_filename):
     xlsx_info = parse_xlsx(xlsx_filename)
-    views.temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+    # views.temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+    temp_table_update(xlsx_info.class_id, xlsx_info.scores)
 
 
 # get_demo_xlsx()

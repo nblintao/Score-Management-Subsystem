@@ -5,7 +5,7 @@ from .models import ScoreTable, TempTable, MessageTable, \
     Course_info, Class_info, class_table, \
     Student_user, Faculty_user
 import json
-#User Authentication
+# User Authentication
 from .forms import NameForm
 from django.template.context import RequestContext
 from django.template import Context
@@ -17,7 +17,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group,Permission
+from django.contrib.auth.models import Group, Permission
 from django.views.decorators.csrf import csrf_protect
 ###
 
@@ -33,10 +33,10 @@ def score_login(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            user = authenticate(username = request.POST['name'],password = request.POST['password'])
+            user = authenticate(username=request.POST['name'], password=request.POST['password'])
             if user is not None:
                 if user.is_active:
-                    #should be changed into /SM/index
+                    # should be changed into /SM/index
                     login(request, user)
                     return HttpResponseRedirect('/SM/query')
                 else:
@@ -55,11 +55,13 @@ def score_query(request):
     t = loader.get_template('score_query.html')
     return HttpResponse(t.render())
 
-#you can use login_required to control access
+
+# you can use login_required to control access
 @login_required
 def score_commit(request):
     t = loader.get_template('score_commit.html')
     return HttpResponse(t.render())
+
 
 @login_required
 def score_modification(request):
@@ -87,7 +89,7 @@ def b_student_query(request, student_id):
                     'credit': tmp_class.course_id.credits,
                     'score': tmp_score,
                     'gradePoint': tmp_gpa
-        }
+                    }
         scores.append(tmp_node)
     print(scores)
     return HttpResponse(json.dumps(scores), content_type="application/json")
@@ -236,3 +238,39 @@ def b_score_modification(c_id, s_id, score, reason):
         #                                 student_id=s_id, class_id=c_id, reason=reason,
         #                                 status=False, score=score)
     print(fac_list)
+
+
+from django.shortcuts import render, render_to_response
+from django import forms
+from django.http import HttpResponse
+from dbtest.models import User
+from dbtest.xls_utils import update_score
+# Create your views here.
+
+class UserForm(forms.Form):
+    xlsx_file = forms.FileField()
+
+
+import os
+def upload_xlsx(request):
+    if request.method == "POST":
+        uf = UserForm(request.POST, request.FILES)
+        if uf.is_valid():
+
+            xlsx_file = uf.cleaned_data['xlsx_file']
+
+            user = User()
+            user.xlsx_file = xlsx_file
+            user.save()
+            update_score('./upload/sample.xlsx')
+            os.remove('./upload/sample.xlsx')
+            return HttpResponse('upload ok!')
+    else:
+        uf = UserForm()
+    return render_to_response('score_upload.html', {'uf': uf})
+
+def download_xlsx(request):
+    with open('./download/sample.xlsx') as file:
+        c = file.read()
+
+    return HttpResponse(c)

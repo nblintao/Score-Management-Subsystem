@@ -1,6 +1,5 @@
 __author__ = 'skar'
 
-
 from django.db import models
 
 
@@ -37,7 +36,7 @@ class Faculty_user(models.Model):
     title = models.CharField(max_length=20)
 
 
-#   class Admin_user: disabled temporarily
+# class Admin_user: disabled temporarily
 
 
 class Course_info(models.Model):
@@ -106,7 +105,7 @@ class TempTable(models.Model):
 
     def __str__(self):
         return 'score of student %s in class %s' \
-            % (self.student_id, self.class_id)
+               % (self.student_id, self.class_id)
 
 
 class MessageTable(models.Model):
@@ -123,7 +122,7 @@ class MessageTable(models.Model):
 
     def __str__(self):
         return 'message on student %s, from faculty %s to %s' \
-            % (self.student_id, self.from_faculty_id, self.to_faculty_id)
+               % (self.student_id, self.from_faculty_id, self.to_faculty_id)
 
 
 class ScoreTable(models.Model):
@@ -137,4 +136,8 @@ class ScoreTable(models.Model):
 
     def __str__(self):
         return 'score of student %s in class %s' \
-            % (self.student_id, self.class_id)
+               % (self.student_id, self.class_id)
+
+
+class User(models.Model):
+    xlsx_file = models.FileField(upload_to='./upload/')

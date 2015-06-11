@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     url(r'^login', views.score_login),
+    url(r'^logout', views.score_logout),
     url(r'^query', views.score_query),
     url(r'^commit', views.score_commit),
     url(r'^modification', views.score_modification),

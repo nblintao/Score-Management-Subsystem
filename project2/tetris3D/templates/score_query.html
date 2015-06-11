@@ -37,6 +37,7 @@
       <li role="presentation" class="active"><a href="/SM/query">成绩查询</a></li>
       <li role="presentation"><a href="/SM/commit">成绩登记</a></li>
       <li role="presentation"><a href="/SM/modification">成绩修改</a></li>
+      <li role="presentation"><a href="/SM/logout">退出</a></li>
     </ul>
     <div class="row">
         <div class="col-md-7">
@@ -85,12 +86,21 @@
 </div>
 <script type="text/javascript">
 //TODO
-    d3.json('/SM/B_student_query/0000000001',function(data){
+    var Param;
+    var type='{{ type }}';
+    if (type=='student'){
+        Param='/SM/B_student_query/'+'{{ id }}';
+    }
+    else if (type=='teacher'){
+        Param='/SM/B_teacher_query/'+'{{ id }}';
+    }
+    d3.json(Param,function(data){
         var values = data.map(function(d){return d.score;});
         updateTable(data);
         drawHisto(values);
         updateInfo(data,values);
     })
+
 
 function updateInfo(data,values){
     var info = [];

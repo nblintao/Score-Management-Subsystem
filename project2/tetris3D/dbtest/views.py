@@ -16,11 +16,22 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib.auth.models import Group, Permission
 from django.views.decorators.csrf import csrf_protect
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import user_passes_test
 ###
 
+def group_required(*group_names):
+    """Requires user membership in at least one of the groups passed in."""
+    def in_groups(u):
+        if u.is_authenticated():
+            if bool(u.groups.filter(name__in=group_names)) | u.is_superuser:
+                return True
+        return False
+    return user_passes_test(in_groups)
 
 # Create your views here.
 def score_login(request):
@@ -33,11 +44,13 @@ def score_login(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            user = authenticate(username=request.POST['name'], password=request.POST['password'])
+            Uname=request.POST['name'];
+            user = authenticate(username=Uname, password=request.POST['password'])
             if user is not None:
                 if user.is_active:
                     # should be changed into /SM/index
                     login(request, user)
+                    #return redirect(reverse('dbtest.views.score_query',kargs=(Uname),))
                     return HttpResponseRedirect('/SM/query')
                 else:
                     return HttpResponseRedirect('/SM/login')
@@ -50,20 +63,36 @@ def score_login(request):
 
     return render(request, 'score_login.html', {'form': form})
 
+@login_required(login_url='/SM/login/')
+def score_logout(request):
+    logout(request);
+    return HttpResponseRedirect('/SM/login')
 
+
+@login_required(login_url='/SM/login/')
 def score_query(request):
     t = loader.get_template('score_query.html')
-    return HttpResponse(t.render())
+    username = request.user.username
+    groups=request.user.groups.values_list('name',flat=True);
+    if len(groups)>0:
+        Type=groups[0]
+    else:
+        Type='admin'
+    #print Type
+    return render(request, 'score_query.html', {'id': username, 'type': Type})
+    #return HttpResponse(t.render(id=name))
 
 
 # you can use login_required to control access
-@login_required
+@login_required(login_url='/SM/login/')
+@group_required('teacher')
 def score_commit(request):
     t = loader.get_template('score_commit.html')
     return HttpResponse(t.render())
 
 
-@login_required
+@login_required(login_url='/SM/login/')
+@group_required('teacher')
 def score_modification(request):
     t = loader.get_template('score_modification.html')
     return HttpResponse(t.render())

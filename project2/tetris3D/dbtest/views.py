@@ -89,7 +89,7 @@ def b_student_query(request, student_id):
                     'credit': tmp_class.course_id.credits,
                     'score': tmp_score,
                     'gradePoint': tmp_gpa
-                    }
+        }
         scores.append(tmp_node)
     print(scores)
     return HttpResponse(json.dumps(scores), content_type="application/json")
@@ -145,7 +145,6 @@ def temp_table_update(c_id, score_list):
     :param score_list: in form of {'studentID': '0000000001', 'score': 100}
     :return:
     """
-
     for pair in score_list:
         print(pair['score'])
         try:
@@ -223,21 +222,77 @@ def b_score_modification(c_id, s_id, score, reason):
     :param reason:
     :return:
     """
-    # authentication check
-
     cla = Class_info.objects.get(class_id=c_id)
     from_fac = Faculty_user.objects.filter(name=cla.teacher)
-    # cou = Course_info.objects.get(course_id=cla.course_id)
-    # cou.class_info_set.all()
-    class_set = cla.course_id.class_info_set.all()
-    fac_list = []
-    for c in class_set:
-        fac = Faculty_user.objects.filter(name=c.teacher)
-        fac_list.append(fac.id)
-        # update_Meaage = MessageTable.objects.create(from_faculty_id=from_fac, to_faculty_id=fac.id,
-        #                                 student_id=s_id, class_id=c_id, reason=reason,
-        #                                 status=False, score=score)
-    print(fac_list)
+    s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id)
+    old_score = s.score
+    chief_faculty = cla.course_id.chief_faculty
+    update_message = MessageTable.objects.create(from_faculty_id=from_fac.id,
+                                                 to_faculty_id=chief_faculty.id,
+                                                 student_id=s_id, class_id=c_id,
+                                                 old_score=old_score, new_score=score,
+                                                 reason=reason, status=False)
+    print(update_message)
+
+
+def b_query_modify_info(faculty_id):
+    """
+    To query the record of faculty's modification requests
+    :param faculty_id:
+    :return: list of both requests from and in the charge of the faculty
+    """
+    modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
+    audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
+    ret = []
+    modify_node = []
+    audit_node = []
+    for rec in modify_list:
+        temp_node = {
+            'messageID': rec.id,
+            'className': rec.class_id.course_id.name,
+            'studentID': rec.student_id.student_id,
+            'studentName': rec.student_id.name,
+            'old_score': rec.old_score,
+            'new_score': rec.new_score,
+            'reason': rec.reason,
+            'status': rec.status
+        }
+        modify_node.append(temp_node)
+    print(modify_node)
+    ret.append(modify_node)
+    for rec in audit_list:
+        temp_node = {
+            'messageID': rec.id,
+            'className': rec.class_id.course_id.name,
+            'studentID': rec.student_id.student_id,
+            'studentName': rec.student_id.name,
+            'old_score': rec.old_score,
+            'new_score': rec.new_score,
+            'reason': rec.reason,
+            'status': rec.status
+        }
+        audit_node.append(temp_node)
+    ret.append(audit_node)
+    print(ret)
+    return HttpResponse(json.dumps(ret), content_type="application/json")
+
+
+def b_sanction_result(msg_id, status):
+    """
+    To update the message status, usually making it True
+    :param msg_id: messageID in the MessageTable
+    :param status: how the status changes
+    :return:
+    """
+    try:
+        l = MessageTable.objects.get(id=msg_id)
+        l.status = status
+        rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
+                                        student_id=l.student_id.student_id).first()
+        rec.score = l.new_score
+        return HttpResponse('Audit Done, Score modified.')
+    except:
+        return HttpResponse('invalid record id.')
 
 
 from django.shortcuts import render, render_to_response
@@ -247,16 +302,18 @@ from dbtest.models import User
 from dbtest.xls_utils import update_score
 # Create your views here.
 
+
 class UserForm(forms.Form):
     xlsx_file = forms.FileField()
 
 
 import os
+
+
 def upload_xlsx(request):
     if request.method == "POST":
         uf = UserForm(request.POST, request.FILES)
         if uf.is_valid():
-
             xlsx_file = uf.cleaned_data['xlsx_file']
 
             user = User()
@@ -268,6 +325,7 @@ def upload_xlsx(request):
     else:
         uf = UserForm()
     return render_to_response('score_upload.html', {'uf': uf})
+
 
 def download_xlsx(request):
     with open('./download/sample.xlsx') as file:

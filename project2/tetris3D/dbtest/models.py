@@ -46,6 +46,7 @@ class Course_info(models.Model):
     | CHARACTER(8) | VARCHAR(110) | FLOAT | INTEGER | VARCHAR(110) | VARCHAR(50) |
     """
     course_id = models.CharField(max_length=8, primary_key=True)
+    chief_faculty = models.ForeignKey(Faculty_user)
     name = models.CharField(max_length=110)
     credits = models.FloatField()
     semester = models.IntegerField()
@@ -68,16 +69,6 @@ class Class_info(models.Model):
     examtime = models.IntegerField()
     examroom = models.CharField(max_length=20)
     capacity = models.IntegerField()
-
-
-class Pre_requisites(models.Model):
-    """
-    | id | prereq |
-    |---|---|
-    | CHARACTER(8) | CHARACTER(8) |
-    """
-    course_id = models.CharField(max_length=8)
-    prereq = models.CharField(max_length=8)
 
 
 class class_table(models.Model):
@@ -113,7 +104,8 @@ class MessageTable(models.Model):
     to_faculty_id = models.ForeignKey(Faculty_user, related_name='%(class)s_to')
     student_id = models.ForeignKey(Student_user)
     class_id = models.ForeignKey(Class_info)
-    score = models.FloatField()
+    old_score = models.FloatField()
+    new_score = models.FloatField()
     reason = models.CharField(max_length=200)
     status = models.BooleanField(default=False)
 

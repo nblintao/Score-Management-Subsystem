@@ -2,4 +2,4 @@
 *.log
 *.synctex.gz
 *.pyc
-/project2/.idea/
+.idea/

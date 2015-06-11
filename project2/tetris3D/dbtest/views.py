@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
@@ -26,12 +26,15 @@ from django.contrib.auth.decorators import user_passes_test
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
+
     def in_groups(u):
         if u.is_authenticated():
             if bool(u.groups.filter(name__in=group_names)) | u.is_superuser:
                 return True
         return False
+
     return user_passes_test(in_groups)
+
 
 # Create your views here.
 def score_login(request):
@@ -44,13 +47,13 @@ def score_login(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            Uname=request.POST['name'];
+            Uname = request.POST['name'];
             user = authenticate(username=Uname, password=request.POST['password'])
             if user is not None:
                 if user.is_active:
                     # should be changed into /SM/index
                     login(request, user)
-                    #return redirect(reverse('dbtest.views.score_query',kargs=(Uname),))
+                    # return redirect(reverse('dbtest.views.score_query',kargs=(Uname),))
                     return HttpResponseRedirect('/SM/query')
                 else:
                     return HttpResponseRedirect('/SM/login')
@@ -63,6 +66,7 @@ def score_login(request):
 
     return render(request, 'score_login.html', {'form': form})
 
+
 @login_required(login_url='/SM/login/')
 def score_logout(request):
     logout(request);
@@ -73,14 +77,14 @@ def score_logout(request):
 def score_query(request):
     t = loader.get_template('score_query.html')
     username = request.user.username
-    groups=request.user.groups.values_list('name',flat=True);
-    if len(groups)>0:
-        Type=groups[0]
+    groups = request.user.groups.values_list('name', flat=True);
+    if len(groups) > 0:
+        Type = groups[0]
     else:
-        Type='admin'
-    #print Type
+        Type = 'admin'
+    # print Type
     return render(request, 'score_query.html', {'id': username, 'type': Type})
-    #return HttpResponse(t.render(id=name))
+    # return HttpResponse(t.render(id=name))
 
 
 # you can use login_required to control access
@@ -118,7 +122,7 @@ def b_student_query(request, student_id):
                     'credit': tmp_class.course_id.credits,
                     'score': tmp_score,
                     'gradePoint': tmp_gpa
-                    }
+        }
         scores.append(tmp_node)
     print(scores)
     return HttpResponse(json.dumps(scores), content_type="application/json")
@@ -174,7 +178,6 @@ def temp_table_update(c_id, score_list):
     :param score_list: in form of {'studentID': '0000000001', 'score': 100}
     :return:
     """
-
     for pair in score_list:
         print(pair['score'])
         try:
@@ -252,21 +255,84 @@ def b_score_modification(c_id, s_id, score, reason):
     :param reason:
     :return:
     """
-    # authentication check
-
     cla = Class_info.objects.get(class_id=c_id)
-    from_fac = Faculty_user.objects.filter(name=cla.teacher)
-    # cou = Course_info.objects.get(course_id=cla.course_id)
-    # cou.class_info_set.all()
-    class_set = cla.course_id.class_info_set.all()
-    fac_list = []
-    for c in class_set:
-        fac = Faculty_user.objects.filter(name=c.teacher)
-        fac_list.append(fac.id)
-        # update_Meaage = MessageTable.objects.create(from_faculty_id=from_fac, to_faculty_id=fac.id,
-        #                                 student_id=s_id, class_id=c_id, reason=reason,
-        #                                 status=False, score=score)
-    print(fac_list)
+    stu = Student_user.objects.get(id=s_id)
+    from_fac = Faculty_user.objects.filter(name=cla.teacher).first()
+    s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id).first()
+    print(s.score)
+    print(s.class_id)
+    print(s.student_id)
+    old_score = s.score
+    chief_faculty = cla.course_id.chief_faculty
+    update_message = MessageTable.objects.create(from_faculty_id=from_fac,
+                                                 to_faculty_id=chief_faculty,
+                                                 student_id=stu, class_id=cla,
+                                                 old_score=old_score, new_score=score,
+                                                 reason=reason, status=False)
+    print(update_message)
+
+
+def b_query_modify_info(faculty_id):
+    """
+    To query the record of faculty's modification requests
+    :param faculty_id:
+    :return: list of both requests from and in the charge of the faculty
+    """
+    modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
+    audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
+    ret = []
+    modify_node = []
+    audit_node = []
+    for rec in modify_list:
+        temp_node = {
+            'messageID': rec.id,
+            'className': rec.class_id.course_id.name,
+            'studentID': rec.student_id.id,
+            'studentName': rec.student_id.name,
+            'old_score': rec.old_score,
+            'new_score': rec.new_score,
+            'reason': rec.reason,
+            'status': rec.status
+        }
+        modify_node.append(temp_node)
+    # print(modify_node)
+    ret.append(modify_node)
+    for rec in audit_list:
+        temp_node = {
+            'messageID': rec.id,
+            'className': rec.class_id.course_id.name,
+            'studentID': rec.student_id.id,
+            'studentName': rec.student_id.name,
+            'old_score': rec.old_score,
+            'new_score': rec.new_score,
+            'reason': rec.reason,
+            'status': rec.status
+        }
+        audit_node.append(temp_node)
+    ret.append(audit_node)
+    print(ret)
+    return HttpResponse(json.dumps(ret), content_type="application/json")
+
+
+def b_sanction_result(msg_id, status):
+    """
+    To update the message status, usually making it True
+    :param msg_id: messageID in the MessageTable
+    :param status: how the status changes
+    :return:
+    """
+    try:
+        print(status)
+        l = MessageTable.objects.get(id=msg_id)
+        if status == '1':
+            l.status = True
+            rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
+                                            student_id=l.student_id.id).first()
+            rec.score = l.new_score
+            rec.save()
+        return HttpResponse('Audit Done, Score modified.')
+    except:
+        return HttpResponse('invalid record id.')
 
 
 from django.shortcuts import render, render_to_response
@@ -276,16 +342,18 @@ from dbtest.models import User
 from dbtest.xls_utils import update_score
 # Create your views here.
 
+
 class UserForm(forms.Form):
     xlsx_file = forms.FileField()
 
 
 import os
+
+
 def upload_xlsx(request):
     if request.method == "POST":
         uf = UserForm(request.POST, request.FILES)
         if uf.is_valid():
-
             xlsx_file = uf.cleaned_data['xlsx_file']
 
             user = User()
@@ -297,6 +365,7 @@ def upload_xlsx(request):
     else:
         uf = UserForm()
     return render_to_response('score_upload.html', {'uf': uf})
+
 
 def download_xlsx(request):
     with open('./download/sample.xlsx') as file:

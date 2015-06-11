@@ -246,6 +246,10 @@ def b_score_query(c_id):
     return HttpResponse(json.dumps(ret_list), content_type="application/json")
 
 
+def B_score_modification(request):
+    print("B_score_modification")
+    
+
 def b_score_modification(c_id, s_id, score, reason):
     """
 

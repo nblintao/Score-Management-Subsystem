@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^B_student_query/(?P<student_id>\d+)', views.b_student_query),
     url(r'^B_teacher_query/(?P<teacher_id>\d+)', views.b_teacher_query),
     url(r'^B_temp_table_query/(?P<c_id>\d+)', views.b_temp_table_query),
+    url(r'^B_score_modification/(?P<c_id>\d+)', views.B_score_modification),
     # url(r'^B_download/(?P<course_id>\d+)', views.B_download),
 ]

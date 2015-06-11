@@ -35,13 +35,13 @@ fac = Faculty_user.objects.create(id='000002', contact='321', name='GrandQi', ge
 
 
 ### Add Course_info
-cour = Course_info.objects.create(course_id='00000001', name='firstclass', credits=1.0, semester='1', textbook='ffff', college='csd')
+cour = Course_info.objects.create(course_id='00000001', name='firstclass', credits=1.0, chief_faculty=fac, semester='1', textbook='ffff', college='csd')
 
-cour = Course_info.objects.create(course_id='00000002', name='secondclass', credits=2.0, semester='3', textbook='hhhh', college='eed')
+cour = Course_info.objects.create(course_id='00000002', name='secondclass', credits=2.0, chief_faculty=fac, semester='3', textbook='hhhh', college='eed')
 
-cour = Course_info.objects.create(course_id='00000003', name='thirdclass', credits=10.0, semester='4', textbook='yourhandbook', college='csd')
+cour = Course_info.objects.create(course_id='00000003', name='thirdclass', credits=10.0, chief_faculty=fac, semester='4', textbook='yourhandbook', college='csd')
 
-cour = Course_info.objects.create(course_id='00000004', name='thirdclass', credits=10.0, semester='4', textbook='yourhandbook', college='csd')
+cour = Course_info.objects.create(course_id='00000004', name='thirdclass', credits=10.0, chief_faculty=fac, semester='4', textbook='yourhandbook', college='csd')
 
 
 ### Add Class_info
@@ -175,3 +175,11 @@ sco = TempTable.objects.create(class_id=cla, student_id=stu, score=66.5)
 stu = Student_user.objects.get(id='0000000004')
 sco = TempTable.objects.create(class_id=cla, student_id=stu, score=99.5)
 
+
+#### Test of modification after commit 
+
+l = views.b_score_modification('0000000001', '0000000001', 88.5, '123')
+l = views.b_query_modify_info('000002')
+l = views.b_sanction_result(1, '1')
+l = views.ScoreTable.objects.filter(class_id='0000000001', student_id='0000000001').first()
+l = views.b_query_modify_info('000002')

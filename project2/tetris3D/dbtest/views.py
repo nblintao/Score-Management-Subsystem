@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import logout
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, Permission
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
@@ -26,12 +26,15 @@ from django.contrib.auth.decorators import user_passes_test
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
+
     def in_groups(u):
         if u.is_authenticated():
             if bool(u.groups.filter(name__in=group_names)) | u.is_superuser:
                 return True
         return False
+
     return user_passes_test(in_groups)
+
 
 # Create your views here.
 def score_login(request):
@@ -44,13 +47,13 @@ def score_login(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            Uname=request.POST['name'];
+            Uname = request.POST['name'];
             user = authenticate(username=Uname, password=request.POST['password'])
             if user is not None:
                 if user.is_active:
                     # should be changed into /SM/index
                     login(request, user)
-                    #return redirect(reverse('dbtest.views.score_query',kargs=(Uname),))
+                    # return redirect(reverse('dbtest.views.score_query',kargs=(Uname),))
                     return HttpResponseRedirect('/SM/query')
                 else:
                     return HttpResponseRedirect('/SM/login')
@@ -63,6 +66,7 @@ def score_login(request):
 
     return render(request, 'score_login.html', {'form': form})
 
+
 @login_required(login_url='/SM/login/')
 def score_logout(request):
     logout(request);
@@ -73,14 +77,14 @@ def score_logout(request):
 def score_query(request):
     t = loader.get_template('score_query.html')
     username = request.user.username
-    groups=request.user.groups.values_list('name',flat=True);
-    if len(groups)>0:
-        Type=groups[0]
+    groups = request.user.groups.values_list('name', flat=True);
+    if len(groups) > 0:
+        Type = groups[0]
     else:
-        Type='admin'
-    #print Type
+        Type = 'admin'
+    # print Type
     return render(request, 'score_query.html', {'id': username, 'type': Type})
-    #return HttpResponse(t.render(id=name))
+    # return HttpResponse(t.render(id=name))
 
 
 # you can use login_required to control access
@@ -252,13 +256,17 @@ def b_score_modification(c_id, s_id, score, reason):
     :return:
     """
     cla = Class_info.objects.get(class_id=c_id)
-    from_fac = Faculty_user.objects.filter(name=cla.teacher)
-    s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id)
+    stu = Student_user.objects.get(id=s_id)
+    from_fac = Faculty_user.objects.filter(name=cla.teacher).first()
+    s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id).first()
+    print(s.score)
+    print(s.class_id)
+    print(s.student_id)
     old_score = s.score
     chief_faculty = cla.course_id.chief_faculty
-    update_message = MessageTable.objects.create(from_faculty_id=from_fac.id,
-                                                 to_faculty_id=chief_faculty.id,
-                                                 student_id=s_id, class_id=c_id,
+    update_message = MessageTable.objects.create(from_faculty_id=from_fac,
+                                                 to_faculty_id=chief_faculty,
+                                                 student_id=stu, class_id=cla,
                                                  old_score=old_score, new_score=score,
                                                  reason=reason, status=False)
     print(update_message)
@@ -279,7 +287,7 @@ def b_query_modify_info(faculty_id):
         temp_node = {
             'messageID': rec.id,
             'className': rec.class_id.course_id.name,
-            'studentID': rec.student_id.student_id,
+            'studentID': rec.student_id.id,
             'studentName': rec.student_id.name,
             'old_score': rec.old_score,
             'new_score': rec.new_score,
@@ -287,13 +295,13 @@ def b_query_modify_info(faculty_id):
             'status': rec.status
         }
         modify_node.append(temp_node)
-    print(modify_node)
+    # print(modify_node)
     ret.append(modify_node)
     for rec in audit_list:
         temp_node = {
             'messageID': rec.id,
             'className': rec.class_id.course_id.name,
-            'studentID': rec.student_id.student_id,
+            'studentID': rec.student_id.id,
             'studentName': rec.student_id.name,
             'old_score': rec.old_score,
             'new_score': rec.new_score,
@@ -314,11 +322,14 @@ def b_sanction_result(msg_id, status):
     :return:
     """
     try:
+        print(status)
         l = MessageTable.objects.get(id=msg_id)
-        l.status = status
-        rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
-                                        student_id=l.student_id.student_id).first()
-        rec.score = l.new_score
+        if status == '1':
+            l.status = True
+            rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
+                                            student_id=l.student_id.id).first()
+            rec.score = l.new_score
+            rec.save()
         return HttpResponse('Audit Done, Score modified.')
     except:
         return HttpResponse('invalid record id.')

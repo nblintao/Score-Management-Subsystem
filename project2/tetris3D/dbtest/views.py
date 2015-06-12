@@ -92,8 +92,9 @@ def score_query(request):
 @login_required(login_url='/SM/login/')
 @group_required('teacher')
 def score_commit(request):
-    t = loader.get_template('score_commit.html')
-    return HttpResponse(t.render(request=request))
+    # t = loader.get_template('score_commit.html')
+    # return HttpResponse(t.render(request=request, context = {"UserForm",UserForm}))
+    return render(request, 'score_commit.html')
 
 
 @login_required(login_url='/SM/login/')

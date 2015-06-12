@@ -77,7 +77,7 @@ def score_logout(request):
 
 @login_required(login_url='/SM/login/')
 def score_query(request):
-    t = loader.get_template('score_query.html')
+    # t = loader.get_template('score_query.html')
     username = request.user.username
     groups = request.user.groups.values_list('name', flat=True);
     if len(groups) > 0:
@@ -85,7 +85,10 @@ def score_query(request):
     else:
         Type = 'admin'
     # print Type
-    return render(request, 'score_query.html', {'id': username, 'type': Type})
+    if Type == 'student':
+        return render(request, 'score_query_student.html')
+    elif Type == 'teacher':
+        return render(request, 'score_query_faculty.html')
     # return HttpResponse(t.render(id=name))
 
 

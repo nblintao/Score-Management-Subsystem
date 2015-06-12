@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Context, loader
@@ -345,40 +346,60 @@ from django.shortcuts import render, render_to_response
 from django import forms
 from django.http import HttpResponse
 from dbtest.models import User
-from dbtest.xls_utils import update_score
+from dbtest.xls_utils import update_score, get_demo_xlsx
 # Create your views here.
 
 
-class UserForm(forms.Form):
+class XlsxForm(forms.Form):
     xlsx_file = forms.FileField()
 
 
 import os
 
 
-def upload_xlsx(request, c_id):
+def upload_xlsx(request, c_id = '0000000001'):
+    upload_dir = './upload/'
+
     if request.method == "POST":
         print(request.POST)
         print(request.FILES)
+        
 
-        uf = UserForm(request.POST, request.FILES)
+        uf = XlsxForm(request.POST, request.FILES)
         if uf.is_valid():
             xlsx_file = uf.cleaned_data['xlsx_file']
 
+            orig_filename = request.FILES['xlsx_file'].name
+            # print(orig_filename)
+
             user = User()
             user.xlsx_file = xlsx_file
-            user.save()
-            update_score('./upload/sample.xlsx')
-            os.remove('./upload/sample.xlsx')
+            user.save("{}.xlsx".format(orig_filename))
+            
+            if not os.path.exists(upload_dir):
+                os.mkdir(upload_dir)
+
+            update_score(upload_dir + '{}'.format(orig_filename))
+            os.remove(upload_dir + '{}'.format(orig_filename))
             return HttpResponse('upload ok!')
     else:
-        uf = UserForm()
+        uf = XlsxForm()
     return render_to_response('score_commit.html', {'uf': uf})
 
 
-def download_xlsx(request, c_id):
-    # get_demo_xlsx(c_id)
-    with open('./download/sample.xlsx') as file:
+def download_xlsx(request, c_id = '0000000001'):
+    download_dir = './download/'
+
+    if request.method is 'GET':
+        print(request.GET)
+
+    get_demo_xlsx(c_id)
+
+    with open(download_dir + '/demo.xlsx', 'rb') as file:
         c = file.read()
 
-    return HttpResponse(c)
+    response = HttpResponse(c)
+    response['Content-Type'] = 'application/octet_stream'
+    response['Content-Disposition'] = 'attachment; filename="sample.xlsx"'
+
+    return response 

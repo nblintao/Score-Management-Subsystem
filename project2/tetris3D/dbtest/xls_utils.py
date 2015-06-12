@@ -51,6 +51,7 @@ def parse_xlsx(xlsx_filename):
     return XlsxInfo(course_id, score_info)
 
 
+import os
 def get_demo_xlsx(course_id='0000000001'):
     wb = Workbook()
     ws = wb.active
@@ -90,7 +91,12 @@ def get_demo_xlsx(course_id='0000000001'):
 
     # Save the file
     ws.page_setup.fitToWidth = 1
-    wb.save("./download/sample.xlsx")
+
+    download_dir = './download/'
+    if not os.path.exists(download_dir):
+        os.mkdir(download_dir)
+
+    wb.save(download_dir + "demo.xlsx")
 
 
 def update_score(xlsx_filename):

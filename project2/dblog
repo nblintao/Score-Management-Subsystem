@@ -179,7 +179,8 @@ sco = TempTable.objects.create(class_id=cla, student_id=stu, score=99.5)
 #### Test of modification after commit 
 
 l = views.b_score_modification('0000000001', '0000000001', 88.5, '123')
-l = views.b_query_modify_info('000002')
+l = views.db_query_modify_info('000002')
 l = views.b_sanction_result(1, '1')
 l = views.ScoreTable.objects.filter(class_id='0000000001', student_id='0000000001').first()
-l = views.b_query_modify_info('000002')
+l = views.db_query_modify_info('000002')
+l = views.b_score_modification('0000000005', '0000000003', 60.5, u'原因是什么我也不知道') 

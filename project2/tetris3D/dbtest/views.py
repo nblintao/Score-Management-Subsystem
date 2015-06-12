@@ -23,6 +23,7 @@ from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import user_passes_test
 ###
+# from dbtest.xls_utils import get_demo_xlsx
 
 def group_required(*group_names):
     """Requires user membership in at least one of the groups passed in."""
@@ -92,7 +93,7 @@ def score_query(request):
 @group_required('teacher')
 def score_commit(request):
     t = loader.get_template('score_commit.html')
-    return HttpResponse(t.render())
+    return HttpResponse(t.render(request=request))
 
 
 @login_required(login_url='/SM/login/')
@@ -354,8 +355,11 @@ class UserForm(forms.Form):
 import os
 
 
-def upload_xlsx(request):
+def upload_xlsx(request, c_id):
     if request.method == "POST":
+        print(request.POST)
+        print(request.FILES)
+
         uf = UserForm(request.POST, request.FILES)
         if uf.is_valid():
             xlsx_file = uf.cleaned_data['xlsx_file']
@@ -368,10 +372,11 @@ def upload_xlsx(request):
             return HttpResponse('upload ok!')
     else:
         uf = UserForm()
-    return render_to_response('score_upload.html', {'uf': uf})
+    return render_to_response('score_commit.html', {'uf': uf})
 
 
-def download_xlsx(request):
+def download_xlsx(request, c_id):
+    # get_demo_xlsx(c_id)
     with open('./download/sample.xlsx') as file:
         c = file.read()
 

@@ -40,8 +40,8 @@
                 </tr>
             </table>
 
-            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-download" aria-hidden="true"></span>下载成绩单</button>
-            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span>上传成绩单<input type="file" /></button>
+            <a id="downloadButton" href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-download" aria-hidden="true"></span>下载成绩单</button></a>
+            <form id="uploadButton" action="" method="post" enctype="multipart/form-data">{% csrf_token %}<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-upload" aria-hidden="true"></span>上传成绩单<input type="file" /></button></form>
             <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>正式提交</button>    
             <table class="table table-hover">
                 <thead>
@@ -108,6 +108,8 @@ function selectCourse(courseID){
         return;
     }
     theCourseInfo = course;
+    d3.select("#downloadButton").attr("href","/SM/B_download_xlsx/" + course.courseID);
+    d3.select("#uploadButton").attr("action","/SM/B_upload_xlsx/" + course.courseID);
     updateInfoTable(course);
     updateStudentTable(course.courseID);
 }

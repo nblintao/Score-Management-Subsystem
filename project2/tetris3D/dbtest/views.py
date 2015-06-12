@@ -89,7 +89,7 @@ def score_query(request):
         return render(request, 'score_query_student.html')
     elif Type == 'teacher':
         return render(request, 'score_query_faculty.html')
-    # return HttpResponse(t.render(id=name))
+        # return HttpResponse(t.render(id=name))
 
 
 # you can use login_required to control access
@@ -257,7 +257,7 @@ def b_score_query(c_id):
 
 def B_score_modification(request):
     print("B_score_modification")
-    
+
 
 def b_score_modification(c_id, s_id, score, reason):
     """
@@ -285,13 +285,7 @@ def b_score_modification(c_id, s_id, score, reason):
     print(update_message)
 
 
-def b_query_modify_info(request):
-    """
-    To query the record of faculty's modification requests
-    :param faculty_id:
-    :return: list of both requests from and in the charge of the faculty
-    """
-    faculty_id = request.user.username
+def db_query_modify_info(faculty_id):
     modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
     audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
     ret = []
@@ -326,6 +320,17 @@ def b_query_modify_info(request):
     ret.append(audit_node)
     print(ret)
     return HttpResponse(json.dumps(ret), content_type="application/json")
+
+
+def b_query_modify_info(request):
+    """
+    To query the record of faculty's modification requests
+    :param faculty_id:
+    :return: list of both requests from and in the charge of the faculty
+    """
+    faculty_id = request.user.username
+    return HttpResponse(json.dumps(db_query_modify_info(faculty_id)),
+                        content_type="application/json")
 
 
 def b_sanction_result(requst, msg_id, status):
@@ -364,13 +369,12 @@ class XlsxForm(forms.Form):
 import os
 
 
-def upload_xlsx(request, c_id = '0000000001'):
+def upload_xlsx(request, c_id='0000000001'):
     upload_dir = './upload/'
 
     if request.method == "POST":
         print(request.POST)
         print(request.FILES)
-        
 
         uf = XlsxForm(request.POST, request.FILES)
         if uf.is_valid():
@@ -382,7 +386,7 @@ def upload_xlsx(request, c_id = '0000000001'):
             user = User()
             user.xlsx_file = xlsx_file
             user.save("{}.xlsx".format(orig_filename))
-            
+
             if not os.path.exists(upload_dir):
                 os.mkdir(upload_dir)
 
@@ -394,7 +398,7 @@ def upload_xlsx(request, c_id = '0000000001'):
     return render_to_response('score_commit.html', {'uf': uf})
 
 
-def download_xlsx(request, c_id = '0000000001'):
+def download_xlsx(request, c_id='0000000001'):
     download_dir = './download/'
 
     if request.method is 'GET':

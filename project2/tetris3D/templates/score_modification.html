@@ -155,10 +155,11 @@
             <div class="panel-heading">成绩修改表</div>
             <div class="panel-body">
                 <!-- TODO 送到哪啊= = -->
-                <form id="requestForm" method="post">
+                <form id="requestForm" action="" method="post">
+                    {% csrf_token %}
                     <div class="form-group" id="InputCourseID">
-                        <label for="InputCourseID">选课课号</label>
-                        <input type="text" class="form-control" readonly="readonly" value="">
+                        <label for="InputCourseID">教学班号</label>
+                        <input name="classID" type="text" class="form-control" readonly="readonly" value="">
                     </div>
                     <div class="form-group" id="InputCourseName" >
                         <label for="InputCourseName">课程名称</label>
@@ -166,7 +167,7 @@
                     </div>
                     <div class="form-group" id="InputStudentID">
                         <label for="InputStudentID">学生学号</label>
-                        <input type="text" class="form-control"readonly="readonly" value="">
+                        <input name="studentID" type="text" class="form-control"readonly="readonly" value="">
                     </div>                  
                     <div class="form-group" id="InputStudentName">
                         <label for="InputStudentName">学生姓名</label>
@@ -176,13 +177,13 @@
                         <label for="InputOldScore">原成绩</label>
                         <input type="text" class="form-control"readonly="readonly" value="">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="InputNewScore">
                         <label for="InputNewScore">新成绩</label>
-                        <input type="text" class="form-control" id="InputNewScore">
+                        <input name="newScore" type="text" class="form-control" id="InputNewScore">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="InputReason">
                         <label for="InputNewScore">理由</label>
-                        <input type="text" class="form-control" id="InputNewScore">
+                        <input name="modifyReason"  type="text" class="form-control" id="InputReason">
                     </div>
 
                     <button type="submit" class="btn btn-default" value="submit">提交修改</button>
@@ -286,7 +287,7 @@ function createForm(classID, studentID){
         if(cTmp.classID == classID)
             break;
     }
-    form[0] = coursesInfo[i].courseID;
+    form[0] = coursesInfo[i].classID;
     form[1] = coursesInfo[i].courseName;
 
     var sTmp;
@@ -301,7 +302,7 @@ function createForm(classID, studentID){
 
     console.log([form]);
 
-    document.getElementById('InputCourseID').innerHTML = '<label for="InputCourseID">选课课号</label><input type="text" class="form-control" readonly="readonly" value="' + form[0] + '">';
+    document.getElementById('InputCourseID').innerHTML = '<label for="InputCourseID">教学班号</label><input type="text" class="form-control" readonly="readonly" value="' + form[0] + '">';
     document.getElementById('InputCourseName').innerHTML = '<label for="InputCourseName">课程名称</label><input type="text" class="form-control"readonly="readonly" value="' + form[1] + '">';
     document.getElementById('InputStudentID').innerHTML = '<label for="InputStudentID">学生学号</label><input type="text" class="form-control"readonly="readonly" value="' + form[2] + '">';
     document.getElementById('InputStudentName').innerHTML = '<label for="InputStudentName">学生姓名</label><input type="text" class="form-control"readonly="readonly" value="' + form[3] + '">';

@@ -105,8 +105,10 @@ def score_modification(request):
     return HttpResponse(t.render())
 
 
-def b_student_query(request, student_id):
-    print(request.session)
+def b_student_query(request):
+    # print(request.session)
+    # print(student_id)
+    student_id = request.user.username
     print(student_id)
     scores = []
     ret = ScoreTable.objects.filter(student_id=student_id)
@@ -195,8 +197,9 @@ def temp_table_update(c_id, score_list):
                                      score=pair['score'])
 
 
-def b_teacher_query(request, teacher_id):
-    return HttpResponse(json.dumps(faculty_class_query(teacher_id)), content_type="application/json")
+def b_teacher_query(request):
+    print(request.user.username)
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username)), content_type="application/json")
 
 
 def faculty_class_query(f_id):
@@ -279,12 +282,13 @@ def b_score_modification(c_id, s_id, score, reason):
     print(update_message)
 
 
-def b_query_modify_info(faculty_id):
+def b_query_modify_info(request):
     """
     To query the record of faculty's modification requests
     :param faculty_id:
     :return: list of both requests from and in the charge of the faculty
     """
+    faculty_id = request.user.username
     modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
     audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
     ret = []
@@ -321,7 +325,7 @@ def b_query_modify_info(faculty_id):
     return HttpResponse(json.dumps(ret), content_type="application/json")
 
 
-def b_sanction_result(msg_id, status):
+def b_sanction_result(requst, msg_id, status):
     """
     To update the message status, usually making it True
     :param msg_id: messageID in the MessageTable

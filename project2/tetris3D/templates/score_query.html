@@ -86,15 +86,16 @@
 </div>
 <script type="text/javascript">
 //TODO
-    var Param;
-    var type='{{ type }}';
-    if (type=='student'){
-        Param='/SM/B_student_query/'+'{{ id }}';
-    }
-    else if (type=='teacher'){
-        Param='/SM/B_teacher_query/'+'{{ id }}';
-    }
-    d3.json(Param,function(data){
+    // var Param;
+    // var type='{{ type }}';
+    // if (type=='student'){
+    //     Param='/SM/B_student_query/'+'{{ id }}';
+    // }
+    // else if (type=='teacher'){
+    //     Param='/SM/B_teacher_query/'+'{{ id }}';
+    // }
+    // d3.json(Param,function(data){
+    d3.json('/SM/B_student_query',function(data){
         var values = data.map(function(d){return d.score;});
         updateTable(data);
         drawHisto(values);

@@ -16,99 +16,105 @@
       <li role="presentation" class="active"><a href="/SM/modification">成绩修改</a></li>
       <li role="presentation"><a href="/SM/logout">退出</a></li>
     </ul>
+
     <div class="row">
-        <div class="col-md-8">     
+        <div class="col-md-8">  
+
             <div class="panel panel-default">
                 <div class="panel-heading"><h3>成绩修改管理</h3></div>
                 <div class="panel-body">
-            <table class="table table-hover">
-                <tr>
-                    <th>选课课号</th>
-                    <th>课程名称</th>
-                    <th>学生学号</th>
-                    <th>学生姓名</th>
-                    <th>原成绩</th>
-                    <th>新成绩</th>
-                    <th>理由</th>
-                    <th>状态</th>
-                </tr>
-                <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
-                    <td>英语口语</td>
-                    <td>3120000064</td>
-                    <td>王五</td>
-                    <td>80</td>
-                    <td>85</td>
-                    <td>补交作业</td>
-                    <td>
-                        <button type="button" class="btn btn-success">同意</button>
-                        <button type="button" class="btn btn-danger">反对</button>
-                    </td>
-                </tr>                
-                <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
-                    <td>英语口语</td>
-                    <td>3120000064</td>
-                    <td>王五</td>
-                    <td>80</td>
-                    <td>85</td>
-                    <td>补交作业</td>
-                    <td>
-                        <span class="label label-info">等待审核</span>
-                    </td>
-                </tr> 
-                <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
-                    <td>英语口语</td>
-                    <td>3120000064</td>
-                    <td>王五</td>
-                    <td>80</td>
-                    <td>85</td>
-                    <td>补交作业</td>
-                    <td>
-                        <span class="label label-success">审核通过</span>
-                    </td>
-                </tr> 
-                <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
-                    <td>英语口语</td>
-                    <td>3120000064</td>
-                    <td>王五</td>
-                    <td>80</td>
-                    <td>85</td>
-                    <td>补交作业</td>
-                    <td>
-                        <span class="label label-danger">审核不通过</span>
-                    </td>
-                </tr> 
-            </table>                    
+                    <table class="table table-hover">
+                        <tr>
+                            <th>选课课号</th>
+                            <th>课程名称</th>
+                            <th>学生学号</th>
+                            <th>学生姓名</th>
+                            <th>原成绩</th>
+                            <th>新成绩</th>
+                            <th>理由</th>
+                            <th>状态</th>
+                        </tr>
+                        <tr>
+                            <td>(2012-2013-2)-04810020-0096419-1</td>
+                            <td>英语口语</td>
+                            <td>3120000064</td>
+                            <td>王五</td>
+                            <td>80</td>
+                            <td>85</td>
+                            <td>补交作业</td>
+                            <td>
+                                <button type="button" class="btn btn-success">同意</button>
+                                <button type="button" class="btn btn-danger">反对</button>
+                            </td>
+                        </tr>                
+                        <tr>
+                            <td>(2012-2013-2)-04810020-0096419-1</td>
+                            <td>英语口语</td>
+                            <td>3120000064</td>
+                            <td>王五</td>
+                            <td>80</td>
+                            <td>85</td>
+                            <td>补交作业</td>
+                            <td>
+                                <span class="label label-info">等待审核</span>
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td>(2012-2013-2)-04810020-0096419-1</td>
+                            <td>英语口语</td>
+                            <td>3120000064</td>
+                            <td>王五</td>
+                            <td>80</td>
+                            <td>85</td>
+                            <td>补交作业</td>
+                            <td>
+                                <span class="label label-success">审核通过</span>
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td>(2012-2013-2)-04810020-0096419-1</td>
+                            <td>英语口语</td>
+                            <td>3120000064</td>
+                            <td>王五</td>
+                            <td>80</td>
+                            <td>85</td>
+                            <td>补交作业</td>
+                            <td>
+                                <span class="label label-danger">审核不通过</span>
+                            </td>
+                        </tr> 
+                    </table>                    
                 </div>
             </div>
 
-            <h3>选择要修改的课程</h3>
-            <table class="table table-hover">
-                <tr>
-                    <th>选课课号</th>
-                    <th>课程名称</th>
-                    <th>学分</th>
-                    <th>上课时间</th>
-                    <th>修改</th>
-                </tr>
-<!--                 <tr>
-                    <td>(2012-2013-2)-04810020-0096419-1</td>
-                    <td>英语口语</td>
-                    <td>1.0</td>
-                    <td><button class="btn btn-default btn-sm">修改此课</button></td>
-                </tr>                
-                <tr>
-                    <td>(2012-2013-2)-04810020-0094359-1</td>
-                    <td>英语写作</td>
-                    <td>2.0</td>
-                    <td><button class="btn btn-default btn-sm">修改此课</button></td>
-                </tr> -->
-                <tbody id = "infoTable"></tbody>
-            </table>
-            <h3>该课程统计信息</h3>
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>选择要修改的课程</h3></div>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <tr>
+                            <th>选课课号</th>
+                            <th>课程名称</th>
+                            <th>学分</th>
+                            <th>上课时间</th>
+                            <th>修改</th>
+                        </tr>
+        <!--                 <tr>
+                            <td>(2012-2013-2)-04810020-0096419-1</td>
+                            <td>英语口语</td>
+                            <td>1.0</td>
+                            <td><button class="btn btn-default btn-sm">修改此课</button></td>
+                        </tr>                
+                        <tr>
+                            <td>(2012-2013-2)-04810020-0094359-1</td>
+                            <td>英语写作</td>
+                            <td>2.0</td>
+                            <td><button class="btn btn-default btn-sm">修改此课</button></td>
+                        </tr> -->
+                        <tbody id = "infoTable"></tbody>
+                    </table>
+                </div>
+            </div>
+<!--             <h3>该课程统计信息</h3>
             <table class="table">
                 <thead>
                     <tr>
@@ -120,74 +126,65 @@
                     </tr>
                 </thead>
                 <tbody id="statInfo"></tbody>
-<!--                 <tbody id="infoTable"><tr><td>4.00</td><td>79.50</td><td>67.00</td><td>87.00</td><td>79.50</td><td>82.00</td><td>91.67</td></tr></tbody>
- -->       
             </table>
+ -->
+            <div class="panel panel-default">
+                <div class="panel-heading"><h3>选择要修改的成绩</h3></div>
+                <div class="panel-body">
+                    <table class="table table-hover">
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>成绩</th>
+                            <th>绩点</th>
+                            <th>修改</th>
+                        </tr>
+                        <tbody id = "studentScore"></tbody>            
+                    </table>  
+                </div>
+            </div>
 
-            <h3>选择要修改的成绩</h3>
-            <table class="table table-hover">
-                <tr>
-                    <th>学号</th>
-                    <th>姓名</th>
-                    <th>成绩</th>
-                    <th>绩点</th>
-                    <th>修改</th>
-                </tr>
-                <tbody id = "studentScore"></tbody>
-<!--                 <tr>
-                    <td>3120000001</td>
-                    <td>张三</td>
-                    <td>87</td>
-                    <td>4.20</td>
-                    <td><button class="btn btn-default btn-sm">修改此成绩</button></td>
-                </tr>
-                <tr>
-                    <td>3120000002</td>
-                    <td>李四</td>
-                    <td>88</td>
-                    <td>4.30</td>
-                    <td><button class="btn btn-default btn-sm">修改此成绩</button></td>
-                </tr>   -->              
-            </table>            
         </div>
-        <div class="col-md-4">
-        <div class="panel panel-default">
-            <div class="panel-heading">成绩修改表</div>
-            <div class="panel-body">
-                <!-- TODO 送到哪啊= = -->
-                <form id="requestForm" action="" method="post">
-                    {% csrf_token %}
-                    <div class="form-group" id="InputCourseID">
-                        <label for="InputCourseID">教学班号</label>
-                        <input name="classID" type="text" class="form-control" readonly="readonly" value="">
-                    </div>
-                    <div class="form-group" id="InputCourseName" >
-                        <label for="InputCourseName">课程名称</label>
-                        <input type="text" class="form-control"readonly="readonly" value="">
-                    </div>
-                    <div class="form-group" id="InputStudentID">
-                        <label for="InputStudentID">学生学号</label>
-                        <input name="studentID" type="text" class="form-control"readonly="readonly" value="">
-                    </div>                  
-                    <div class="form-group" id="InputStudentName">
-                        <label for="InputStudentName">学生姓名</label>
-                        <input type="text" class="form-control"readonly="readonly" value="">
-                    </div>
-                    <div class="form-group" id="InputOldScore">
-                        <label for="InputOldScore">原成绩</label>
-                        <input type="text" class="form-control"readonly="readonly" value="">
-                    </div>
-                    <div class="form-group" id="InputNewScore">
-                        <label for="InputNewScore">新成绩</label>
-                        <input name="newScore" type="text" class="form-control" id="InputNewScore">
-                    </div>
-                    <div class="form-group" id="InputReason">
-                        <label for="InputNewScore">理由</label>
-                        <input name="modifyReason"  type="text" class="form-control" id="InputReason">
-                    </div>
 
-                    <button type="submit" class="btn btn-default" value="submit">提交修改</button>
-                </form>
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">成绩修改表</div>
+                <div class="panel-body">
+                    <!-- TODO 送到哪啊= = -->
+                    <form id="requestForm" action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-group" id="InputCourseID">
+                            <label for="InputCourseID">教学班号</label>
+                            <input name="classID" type="text" class="form-control" readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="InputCourseName" >
+                            <label for="InputCourseName">课程名称</label>
+                            <input type="text" class="form-control"readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="InputStudentID">
+                            <label for="InputStudentID">学生学号</label>
+                            <input name="studentID" type="text" class="form-control"readonly="readonly" value="">
+                        </div>                  
+                        <div class="form-group" id="InputStudentName">
+                            <label for="InputStudentName">学生姓名</label>
+                            <input type="text" class="form-control"readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="InputOldScore">
+                            <label for="InputOldScore">原成绩</label>
+                            <input type="text" class="form-control"readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="InputNewScore">
+                            <label for="InputNewScore">新成绩</label>
+                            <input name="newScore" type="text" class="form-control" id="InputNewScore">
+                        </div>
+                        <div class="form-group" id="InputReason">
+                            <label for="InputNewScore">理由</label>
+                            <input name="modifyReason"  type="text" class="form-control" id="InputReason">
+                        </div>
+
+                        <button type="submit" class="btn btn-default" value="submit">提交修改</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

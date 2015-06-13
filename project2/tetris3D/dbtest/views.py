@@ -211,6 +211,10 @@ def temp_table_update(c_id, score_list):
     :param score_list: in form of {'studentID': '0000000001', 'score': 100}
     :return:
     """
+    print("DEBUG BEGIN")
+    print(c_id)
+    print(score_list)
+    print("DEBUG END")
     for pair in score_list:
         print(pair['score'])
         try:  # upload after init upload, modify the record
@@ -218,6 +222,7 @@ def temp_table_update(c_id, score_list):
             tmp_rec.score = pair['score']
             tmp_rec.save()
         except:  # The first time to upload the records, create tuples
+            print(pair['studentID'])
             s_id_instance = Student_user.objects.filter(id=pair['studentID']).first()
             c_id_instance = Class_info.objects.filter(class_id=c_id).first()
             if s_id_instance is not None and c_id_instance is not None:
@@ -225,7 +230,10 @@ def temp_table_update(c_id, score_list):
                                          class_id=c_id_instance,
                                          score=pair['score'])
             else:
-                return HttpResponse(u'非法班级号或学号')
+                print("s_id_instance None or c_id_instance None")
+                print(s_id_instance)
+                print(c_id_instance)
+                # return HttpResponse(u'非法班级号或学号')
 
 
 
@@ -488,7 +496,10 @@ def upload_xlsx(request, c_id):
                 os.mkdir(upload_dir)
 
             update_score(upload_dir + '{}'.format(orig_filename), c_id)
-            os.remove(upload_dir + '{}'.format(orig_filename))
+            try:
+                os.remove(upload_dir + '{}'.format(orig_filename))
+            except:
+                print("Cannot remove file" + upload_dir + '{}'.format(orig_filename))
             return HttpResponse('upload ok!')
     else:
         uf = XlsxForm()

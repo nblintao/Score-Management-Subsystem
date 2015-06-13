@@ -213,11 +213,11 @@ def temp_table_update(c_id, score_list):
 
 def b_teacher_query(request):
     print(request.user.username)
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username), False), content_type="application/json")
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username, False)), content_type="application/json")
 
 
 def b_teacher_temp_query(request):
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username), True), content_type="application/json")
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username, True)), content_type="application/json")
 
 
 def faculty_class_query(f_id, is_temp):

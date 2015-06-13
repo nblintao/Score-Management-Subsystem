@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^modification', views.score_modification),
     url(r'^B_student_query', views.b_student_query),
     url(r'^B_teacher_query', views.b_teacher_query),
+    # url(r'^B_teacher_temp_query', views.b_teacher_temp_query),
     url(r'^B_temp_table_query/(?P<c_id>\d+)', views.b_temp_table_query),
     url(r'^B_score_modification', views.B_score_modification),
     url(r'^B_query_modify_info', views.b_query_modify_info),

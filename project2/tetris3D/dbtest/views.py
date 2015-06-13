@@ -436,6 +436,8 @@ def upload_xlsx(request, c_id='0000000001'):
     else:
         uf = XlsxForm()
     return render_to_response('score_commit.html', {'uf': uf})
+    # return render(request, 'score_commit.html')
+
 
 
 def download_xlsx(request, c_id):

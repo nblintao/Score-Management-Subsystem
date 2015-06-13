@@ -51,14 +51,59 @@ def parse_xlsx(xlsx_filename):
     return XlsxInfo(course_id, score_info)
 
 
+# import os
+# def get_demo_xlsx(course_id='0000000001'):
+#     wb = Workbook()
+#     ws = wb.active
+#     ws.title = 'score sheet 1'
+#
+#     # todo: should get course id from front-end
+#     course_id = '0000000001'
+#     student_info = class_info_query(course_id)
+#     # student_info = views.class_info_query(course_id)
+#
+#
+#     # Formatting
+#     ws.append([])
+#     ws.append([])
+#     ws.merge_cells('A1:F2')
+#     center_align = Alignment(horizontal='center', vertical='center')
+#
+#     # Initialization
+#     ws['A1'] = '浙江大学课程考试成绩记录表'
+#     ws['A1'].alignment = center_align
+#
+#     ws.append(['教学班名称', '', '教师姓名', '', '课程编号'])
+#     ws.append([])
+#     ws.append(['学号', '姓名', '成绩', '备注'])
+#
+#
+#     # Filling the data.
+#     ws['F3'] = course_id
+#
+#     for row in student_info:
+#         # for row in range(5, 5 + 10):
+#         # ws['A' + str(row)] = '312xxxxxxx'
+#         # ws['B' + str(row)] = 'Elder Wang'
+#         # ws['C' + str(row)] = '{0:.2f}'.format(random.Random().random() * 100)
+#         row_info = [row['studentID'], row['studentName']]
+#         ws.append(row_info)
+#
+#     # Save the file
+#     ws.page_setup.fitToWidth = 1
+#
+#     download_dir = './download/'
+#     if not os.path.exists(download_dir):
+#         os.mkdir(download_dir)
+#
+#     wb.save(download_dir + "demo.xlsx")
 import os
-def get_demo_xlsx(course_id='0000000001'):
+def get_demo_xlsx(course_id):
     wb = Workbook()
     ws = wb.active
     ws.title = 'score sheet 1'
 
     # todo: should get course id from front-end
-    course_id = '0000000001'
     student_info = class_info_query(course_id)
     # student_info = views.class_info_query(course_id)
 
@@ -86,7 +131,10 @@ def get_demo_xlsx(course_id='0000000001'):
         # ws['A' + str(row)] = '312xxxxxxx'
         # ws['B' + str(row)] = 'Elder Wang'
         # ws['C' + str(row)] = '{0:.2f}'.format(random.Random().random() * 100)
-        row_info = [row['studentID'], row['studentName']]
+        if row['score'] is None:
+            row_info = [row['studentID'], row['studentName']]
+        else:
+            row_info = [row['studentID'], row['studentName'], row['score']]
         ws.append(row_info)
 
     # Save the file

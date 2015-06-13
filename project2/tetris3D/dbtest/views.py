@@ -144,15 +144,22 @@ def class_info_query(c_id):
     tmp_cla = class_table.objects.filter(class_id=c_id)
     namelist = []
     for stu in tmp_cla:
+        s = TempTable.objects.filter(student_id=stu.student_id.id,
+                                     class_id=c_id).first()
+        if s is None:
+            score = None
+        else:
+            score = s.score
         tmp_node = {
             'studentID': stu.student_id.id,
-            'studentName': stu.student_id.name
+            'studentName': stu.student_id.name,
+            'score': score
         }
         namelist.append(tmp_node)
     return namelist
 
 
-def b_temp_table_query(request, c_id):
+def db_temp_table_query(c_id):
     """
 
     :param c_id: class_id
@@ -179,6 +186,10 @@ def b_temp_table_query(request, c_id):
     return HttpResponse(json.dumps(ret_list), content_type="application/json")
 
 
+def b_temp_table_query(request, c_id):
+    return HttpResponse(json.dumps(db_temp_table_query(c_id)), content_type="application/json")
+
+
 def temp_table_update(c_id, score_list):
     """
     To update the temptable
@@ -202,10 +213,14 @@ def temp_table_update(c_id, score_list):
 
 def b_teacher_query(request):
     print(request.user.username)
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username)), content_type="application/json")
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username), False), content_type="application/json")
 
 
-def faculty_class_query(f_id):
+def b_teacher_temp_query(request):
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username), True), content_type="application/json")
+
+
+def faculty_class_query(f_id, is_temp):
     """
     authentication check in need
     :param f_id: faculty_id
@@ -214,6 +229,14 @@ def faculty_class_query(f_id):
     info_list = []
     tmp_f = Faculty_user.objects.get(id=f_id)
     cla_list = Class_info.objects.filter(teacher=tmp_f.name)
+    tmp_cla_list = []
+    for cla in cla_list:
+        l = ScoreTable.objects.filter(class_id=cla.class_id).first()
+        if is_temp and l is None:
+            tmp_cla_list.append(cla)
+        elif not is_temp and l is not None:
+            tmp_cla_list.append(cla)
+    cla_list = tmp_cla_list
     for cla in cla_list:
         tmp_node = {
             'classID': cla.class_id,
@@ -281,7 +304,7 @@ def b_score_modification(c_id, s_id, score, reason):
                                                  to_faculty_id=chief_faculty,
                                                  student_id=stu, class_id=cla,
                                                  old_score=old_score, new_score=score,
-                                                 reason=reason, status=False)
+                                                 reason=reason, status=0)
     print(update_message)
 
 
@@ -292,6 +315,12 @@ def db_query_modify_info(faculty_id):
     modify_node = []
     audit_node = []
     for rec in modify_list:
+        if rec.status == 0:
+            tmp_status = 'pending'
+        elif rec.status == 1:
+            tmp_status = 'reject'
+        else:
+            tmp_status = 'admit'
         temp_node = {
             'messageID': rec.id,
             'className': rec.class_id.course_id.name,
@@ -300,12 +329,18 @@ def db_query_modify_info(faculty_id):
             'old_score': rec.old_score,
             'new_score': rec.new_score,
             'reason': rec.reason,
-            'status': rec.status
+            'status': tmp_status
         }
         modify_node.append(temp_node)
     # print(modify_node)
     ret.append(modify_node)
     for rec in audit_list:
+        if rec.status == 0:
+            tmp_status = 'pending'
+        elif rec.status == 1:
+            tmp_status = 'reject'
+        else:
+            tmp_status = 'admit'
         temp_node = {
             'messageID': rec.id,
             'className': rec.class_id.course_id.name,
@@ -314,18 +349,18 @@ def db_query_modify_info(faculty_id):
             'old_score': rec.old_score,
             'new_score': rec.new_score,
             'reason': rec.reason,
-            'status': rec.status
+            'status': tmp_status
         }
         audit_node.append(temp_node)
     ret.append(audit_node)
     print(ret)
-    return HttpResponse(json.dumps(ret), content_type="application/json")
+    return ret
 
 
 def b_query_modify_info(request):
     """
     To query the record of faculty's modification requests
-    :param faculty_id:
+    :param request:
     :return: list of both requests from and in the charge of the faculty
     """
     faculty_id = request.user.username
@@ -344,12 +379,17 @@ def b_sanction_result(requst, msg_id, status):
         print(status)
         l = MessageTable.objects.get(id=msg_id)
         if status == '1':
-            l.status = True
+            l.status = 2
+            l.save()
             rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
                                             student_id=l.student_id.id).first()
             rec.score = l.new_score
             rec.save()
-        return HttpResponse('Audit Done, Score modified.')
+            return HttpResponse('Audit Done, Score modified.')
+        elif status == '0':
+            l.status = 1
+            l.save()
+            return HttpResponse('Audit Done, Score will not change.')
     except:
         return HttpResponse('invalid record id.')
 
@@ -398,11 +438,11 @@ def upload_xlsx(request, c_id='0000000001'):
     return render_to_response('score_commit.html', {'uf': uf})
 
 
-def download_xlsx(request, c_id='0000000001'):
+def download_xlsx(request, c_id):
     download_dir = './download/'
 
-    if request.method is 'GET':
-        print(request.GET)
+    # if request.method is 'GET':
+    # print(request.GET)
 
     get_demo_xlsx(c_id)
 

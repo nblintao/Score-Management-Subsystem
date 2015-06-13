@@ -107,7 +107,7 @@ class MessageTable(models.Model):
     old_score = models.FloatField()
     new_score = models.FloatField()
     reason = models.CharField(max_length=200)
-    status = models.BooleanField(default=False)
+    status = models.IntegerField(default=0)
 
     class Meta:
         ordering = ["from_faculty_id"]

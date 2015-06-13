@@ -109,6 +109,12 @@ def score_modification(request):
 
 
 def b_student_query(request):
+    """
+    Query the score records that have already been committed
+    :param request: the request object from the browser
+    :return: return the json in form of {courseID, courseName,
+                                        credit, score, gradePoint}
+    """
     # print(request.session)
     # print(student_id)
     student_id = request.user.username
@@ -138,8 +144,9 @@ def b_student_query(request):
 
 def class_info_query(c_id):
     """
+    Get the information of the class according to the given class_id
     :param c_id: Class id
-    :return: List of student info, in form of {'studentID': '0000000001', 'studentName': 'john'}
+    :return: list of student info, in form of {studentID, studentName}
     """
     tmp_cla = class_table.objects.filter(class_id=c_id)
     namelist = []
@@ -161,14 +168,14 @@ def class_info_query(c_id):
 
 def db_temp_table_query(c_id):
     """
-
+    Get the records from the database according to the given class_id
     :param c_id: class_id
-    :return: score in temptable
+    :return: score in temptable in form of {studentID, studentName, score, gradePoint}
     """
     ret_list = []
     sco_list = TempTable.objects.filter(class_id=c_id)
     for stu in sco_list:
-        tmp_score = stu.score
+        tmp_score = stu.score                       # calculate gpa
         if tmp_score < 60:
             tmp_gpa = 0
         else:
@@ -183,10 +190,17 @@ def db_temp_table_query(c_id):
         }
         ret_list.append(tmp_node)
     print(ret_list)
-    return HttpResponse(json.dumps(ret_list), content_type="application/json")
+    # return HttpResponse(json.dumps(ret_list), content_type="application/json")
+    return ret_list
 
 
 def b_temp_table_query(request, c_id):
+    """
+    Respond to the browser request with the score record required
+    :param request: the request object from the browser
+    :param c_id: class_id from browser
+    :return: json file
+    """
     return HttpResponse(json.dumps(db_temp_table_query(c_id)), content_type="application/json")
 
 
@@ -199,11 +213,11 @@ def temp_table_update(c_id, score_list):
     """
     for pair in score_list:
         print(pair['score'])
-        try:
+        try:                    # upload after init upload, modify the record
             tmp_rec = TempTable.objects.get(class_id=c_id, student_id=pair['studentID'])
             tmp_rec.score = pair['score']
             tmp_rec.save()
-        except:
+        except:                 # The first time to upload the records, create tuples
             s_id_instance = Student_user.objects.get(id=pair['studentID'])
             c_id_instance = Class_info.objects.get(class_id=c_id)
             TempTable.objects.create(student_id=s_id_instance,
@@ -212,29 +226,39 @@ def temp_table_update(c_id, score_list):
 
 
 def b_teacher_query(request):
+    """
+    Respond to the browser request with committed score records
+    :param request: the request object from the browser
+    :return: json file
+    """
     print(request.user.username)
     return HttpResponse(json.dumps(faculty_class_query(request.user.username, False)), content_type="application/json")
 
 
 def b_teacher_temp_query(request):
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username, True)), content_type="application/json")
+    """
+    Respond to the browser request with uncommitted score records
+    :param request: the request object from the browser
+    :return: json file
+    """
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username,  True)), content_type="application/json")
 
 
 def faculty_class_query(f_id, is_temp):
     """
     authentication check in need
     :param f_id: faculty_id
-    :return: list in form of {}
+    :return: list in form of {classID, classTime, courseID, courseName, credits}
     """
     info_list = []
     tmp_f = Faculty_user.objects.get(id=f_id)
-    cla_list = Class_info.objects.filter(teacher=tmp_f.name)
+    cla_list = Class_info.objects.filter(teacher=tmp_f.name)    # all class list
     tmp_cla_list = []
     for cla in cla_list:
         l = ScoreTable.objects.filter(class_id=cla.class_id).first()
-        if is_temp and l is None:
+        if is_temp and l is None:                   # query uncommitted classes
             tmp_cla_list.append(cla)
-        elif not is_temp and l is not None:
+        elif not is_temp and l is not None:         # query committed classes
             tmp_cla_list.append(cla)
     cla_list = tmp_cla_list
     for cla in cla_list:
@@ -309,13 +333,19 @@ def b_score_modification(c_id, s_id, score, reason):
 
 
 def db_query_modify_info(faculty_id):
+    """
+    Query the MessageTable of records for and from the faculty
+    :param faculty_id: as the title
+    :return: list in form of {messageID, className, studentID, studentName, old_score,
+                                new_score, reason, status}
+    """
     modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
     audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
     ret = []
     modify_node = []
     audit_node = []
     for rec in modify_list:
-        if rec.status == 0:
+        if rec.status == 0:             # prevent malicious hacking in js level
             tmp_status = 'pending'
         elif rec.status == 1:
             tmp_status = 'reject'
@@ -373,7 +403,7 @@ def b_sanction_result(requst, msg_id, status):
     To update the message status, usually making it True
     :param msg_id: messageID in the MessageTable
     :param status: how the status changes
-    :return:
+    :return: if_succeeded as an HttpResponse object
     """
     try:
         print(status)
@@ -385,13 +415,38 @@ def b_sanction_result(requst, msg_id, status):
                                             student_id=l.student_id.id).first()
             rec.score = l.new_score
             rec.save()
-            return HttpResponse('Audit Done, Score modified.')
+            return HttpResponse(u'审核成功，成绩将被修改')
         elif status == '0':
             l.status = 1
             l.save()
-            return HttpResponse('Audit Done, Score will not change.')
+            return HttpResponse(u'审核成功，成绩不同意被修改')
     except:
-        return HttpResponse('invalid record id.')
+        return HttpResponse(u'非法记录号')
+
+
+def b_final_commit(request, c_id):
+    """
+    Operations on `final commit` from a faculty, in class level
+    :param c_id: class_id
+    :return:
+    """
+    fac = Faculty_user.objects.filter(id=request.user.username).first()
+    cla = Class_info.objects.filter(class_id=c_id).first()
+    if cla.teacher != fac.name:
+        return HttpResponse(u'未授权请求!')
+    else:
+        is_exist = TempTable.objects.filter(class_id=cla.class_id).first()
+        if is_exist is None:
+            return HttpResponse(u'成绩未上传！')
+        score_list = TempTable.objects.filter(class_id=cla.class_id)
+        for rec in score_list:
+            ScoreTable.objects.create(class_id=rec.class_id,
+                                      student_id=rec.student_id,
+                                      score=rec.score)
+        TempTable.objects.filter(class_id=cla.class_id).delete()
+        return HttpResponse(u'提交成功！')
+
+
 
 
 from django.shortcuts import render, render_to_response

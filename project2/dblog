@@ -33,6 +33,7 @@ fac = Faculty_user.objects.create(id='000001', contact='123', name='chairLin', g
 
 fac = Faculty_user.objects.create(id='000002', contact='321', name='GrandQi', gender=False, college='csd', major='cse', degree='phd', title='prof')
 
+fac = Faculty_user.objects.create(id='000003', contact='haha', name='GrandZhu', gender=True, college='csd', major='cse', degree='phd', title='prof')
 
 ### Add Course_info
 cour = Course_info.objects.create(course_id='00000001', name='firstclass', credits=1.0, chief_faculty=fac, semester='1', textbook='ffff', college='csd')
@@ -179,8 +180,10 @@ sco = TempTable.objects.create(class_id=cla, student_id=stu, score=99.5)
 #### Test of modification after commit 
 
 l = views.b_score_modification('0000000001', '0000000001', 88.5, '123')
+l = views.b_score_modification('0000000001', '0000000002', 0, u'考试作弊了')
 l = views.db_query_modify_info('000002')
-l = views.b_sanction_result(1, '1')
+#　l = views.b_sanction_result(1, '1')
 l = views.ScoreTable.objects.filter(class_id='0000000001', student_id='0000000001').first()
 l = views.db_query_modify_info('000002')
 l = views.b_score_modification('0000000005', '0000000003', 60.5, u'原因是什么我也不知道') 
+l = views.b_score_modification('0000000005', '0000000004', 100, u'成绩改错了') 

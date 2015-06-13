@@ -319,7 +319,8 @@ def db_query_modify_info(faculty_id):
         audit_node.append(temp_node)
     ret.append(audit_node)
     print(ret)
-    return HttpResponse(json.dumps(ret), content_type="application/json")
+    return ret
+    # return HttpResponse(json.dumps(ret), content_type="application/json")
 
 
 def b_query_modify_info(request):
@@ -396,6 +397,8 @@ def upload_xlsx(request, c_id='0000000001'):
     else:
         uf = XlsxForm()
     return render_to_response('score_commit.html', {'uf': uf})
+    # return render(request, 'score_commit.html')
+
 
 
 def download_xlsx(request, c_id='0000000001'):

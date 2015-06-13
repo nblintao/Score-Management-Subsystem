@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'^B_temp_table_query/(?P<c_id>\d+)', views.b_temp_table_query),
     url(r'^B_score_modification', views.B_score_modification),
     url(r'^B_query_modify_info', views.b_query_modify_info),
-    url(r'^B_sanction_result/(?P<msg_id>\d+)/(?P<c_id>[01])', views.b_sanction_result),
+    url(r'^B_sanction_result/(?P<msg_id>\d+)/(?P<status>[01])', views.b_sanction_result),
     url(r'^B_upload_xlsx/(?P<c_id>\d+)', views.upload_xlsx),
     url(r'^B_download_xlsx/(?P<c_id>\d+)', views.download_xlsx),
     # url(r'^B_download/(?P<course_id>\d+)', views.B_download),

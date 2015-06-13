@@ -24,16 +24,19 @@
                 <div class="panel-heading"><h3>成绩修改管理</h3></div>
                 <div class="panel-body">
                     <table class="table table-hover">
-                        <tr>
-                            <th>选课课号</th>
-                            <th>课程名称</th>
-                            <th>学生学号</th>
-                            <th>学生姓名</th>
-                            <th>原成绩</th>
-                            <th>新成绩</th>
-                            <th>理由</th>
-                            <th>状态</th>
-                        </tr>
+                        <thead>
+                            <tr>
+                                <th>申请编号</th>
+                                <th>课程名称</th>
+                                <th>学生学号</th>
+                                <th>学生姓名</th>
+                                <th>原成绩</th>
+                                <th>新成绩</th>
+                                <th>理由</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id = "modifyInfoTable">
                         <tr>
                             <td>(2012-2013-2)-04810020-0096419-1</td>
                             <td>英语口语</td>
@@ -83,6 +86,7 @@
                                 <span class="label label-danger">审核不通过</span>
                             </td>
                         </tr> 
+                        </tbody>
                     </table>                    
                 </div>
             </div>
@@ -193,9 +197,60 @@
 <script type="text/javascript">
 
 d3.json("B_query_modify_info",function(data){
+    // console.log(data);
+    // data = [ [{'new_score': 88.5, 'studentName': 'zhazha', 'messageID': 5, 'old_score': 66.5, 'studentID': '0000000001', 'status': 'reject', 'reason': '123', 'className': 'firstclass'}, {'new_score': 60.5, 'studentName': 'lalala', 'messageID': 6, 'old_score': 60.5, 'studentID': '0000000003', 'status': 'admit', 'reason': '原因是什么我也不知道', 'className': 'thirdclass'}, {'new_score': 60.5, 'studentName': 'lalala', 'messageID': 66, 'old_score': 60.5, 'studentID': '0000000003', 'status': 'pending', 'reason': '原因是什么我也不知道', 'className': 'thirdclass'}],[{'new_score': 60.5, 'studentName': 'lalala', 'messageID': 6, 'old_score': 60.5, 'studentID': '0000000003', 'status': 'pending', 'reason': 'ppp么我也不知道','className': 'thirdclass'}]];
+    d3.select('#modifyInfoTable').selectAll("tr").remove();
+    // // modify_list
+    // addModifyInfoTable(data[0], 'modify');
+    // // audit_list
+    // addModifyInfoTable(data[1], 'audit');
+    modifyData = data[0].map(function(d){d.type='modify';return d;});
+    auditData = data[1].map(function(d){d.type='audit';return d;});
+    data = modifyData.concat(auditData);
     console.log(data);
-    //TODO wait for demo data
+    d3.select("#modifyInfoTable").selectAll("tr")
+    .data(data)
+    .enter().append("tr")
+    .html(function(d){
+        str = '';
+        str += "<td>" + d.messageID + "</td>";
+        str += "<td>" + d.className + "</td>";
+        str += "<td>" + d.studentID + "</td>";
+        str += "<td>" + d.studentName + "</td>";
+        str += "<td>" + d.old_score + "</td>";
+        str += "<td>" + d.new_score + "</td>";
+        str += "<td>" + d.reason + "</td>";
+        str += "<td>" + generateIcon(d) + "</td>";
+        return str;
+    });    
 })
+
+function generateIcon(mess){
+    if(mess.type == 'modify'){
+        switch(mess.status){
+            case 'admit':
+                return '<span class="label label-success">审核通过</span>';
+            case 'reject':
+                return '<span class="label label-danger">审核不通过</span>';
+            case 'pending':
+                return '<span class="label label-info">等待审核</span>';
+            default:
+                console.log(mess.status);
+        }
+    }else if (mess.type == 'audit'){
+        switch(mess.status){
+            case 'admit':
+                return '<span class="label label-success">审核通过（我审的）</span>';
+            case 'reject':
+                return '<span class="label label-danger">审核不通过（我审的）</span>';
+            case 'pending':
+                var url = "B_sanction_result/"+mess.messageID+"/";
+                return '<a href="'+url+'1"><button type="button" class="btn btn-success">同意</button></a><a href="'+url+'0"><button type="button" class="btn btn-danger">反对</button>';
+            default:
+                console.log(mess.status);   
+        }     
+    }
+}
 
     d3.json('/SM/B_teacher_query',function(data){
      // console.log(data);

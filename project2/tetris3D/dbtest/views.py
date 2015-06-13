@@ -190,7 +190,8 @@ def db_temp_table_query(c_id):
         }
         ret_list.append(tmp_node)
     print(ret_list)
-    return HttpResponse(json.dumps(ret_list), content_type="application/json")
+    # return HttpResponse(json.dumps(ret_list), content_type="application/json")
+    return ret_list
 
 
 def b_temp_table_query(request, c_id):

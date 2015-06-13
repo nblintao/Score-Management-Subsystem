@@ -175,7 +175,7 @@ def db_temp_table_query(c_id):
     ret_list = []
     sco_list = TempTable.objects.filter(class_id=c_id)
     for stu in sco_list:
-        tmp_score = stu.score                       # calculate gpa
+        tmp_score = stu.score  # calculate gpa
         if tmp_score < 60:
             tmp_gpa = 0
         else:
@@ -213,16 +213,20 @@ def temp_table_update(c_id, score_list):
     """
     for pair in score_list:
         print(pair['score'])
-        try:                    # upload after init upload, modify the record
+        try:  # upload after init upload, modify the record
             tmp_rec = TempTable.objects.get(class_id=c_id, student_id=pair['studentID'])
             tmp_rec.score = pair['score']
             tmp_rec.save()
-        except:                 # The first time to upload the records, create tuples
-            s_id_instance = Student_user.objects.get(id=pair['studentID'])
-            c_id_instance = Class_info.objects.get(class_id=c_id)
-            TempTable.objects.create(student_id=s_id_instance,
-                                     class_id=c_id_instance,
-                                     score=pair['score'])
+        except:  # The first time to upload the records, create tuples
+            s_id_instance = Student_user.objects.filter(id=pair['studentID']).first()
+            c_id_instance = Class_info.objects.filter(class_id=c_id).first()
+            if s_id_instance is not None and c_id_instance is not None:
+                TempTable.objects.create(student_id=s_id_instance,
+                                         class_id=c_id_instance,
+                                         score=pair['score'])
+            else:
+                return HttpResponse(u'非法班级号或学号')
+
 
 
 def b_teacher_query(request):
@@ -241,7 +245,7 @@ def b_teacher_temp_query(request):
     :param request: the request object from the browser
     :return: json file
     """
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username,  True)), content_type="application/json")
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username, True)), content_type="application/json")
 
 
 def faculty_class_query(f_id, is_temp):
@@ -252,22 +256,22 @@ def faculty_class_query(f_id, is_temp):
     """
     info_list = []
     tmp_f = Faculty_user.objects.get(id=f_id)
-    cla_list = Class_info.objects.filter(teacher=tmp_f.name)    # all class list
+    cla_list = Class_info.objects.filter(teacher=tmp_f.name)  # all class list
     tmp_cla_list = []
     for cla in cla_list:
         l = ScoreTable.objects.filter(class_id=cla.class_id).first()
-        if is_temp and l is None:                   # query uncommitted classes
+        if is_temp and l is None:  # query uncommitted classes
             tmp_cla_list.append(cla)
-        elif not is_temp and l is not None:         # query committed classes
+        elif not is_temp and l is not None:  # query committed classes
             tmp_cla_list.append(cla)
     cla_list = tmp_cla_list
     for cla in cla_list:
-        tmp_node = {
-            'classID': cla.class_id,
-            'classTime': cla.time,
-            'courseID': cla.course_id.course_id,
-            'courseName': cla.course_id.name,
-            'credits': cla.course_id.credits
+        tmp_node = {  # generate node for list
+                      'classID': cla.class_id,
+                      'classTime': cla.time,
+                      'courseID': cla.course_id.course_id,
+                      'courseName': cla.course_id.name,
+                      'credits': cla.course_id.credits
         }
         info_list.append(tmp_node)
     return info_list
@@ -285,17 +289,17 @@ def b_score_query(c_id):
     # print(sco_list)
     for stu in sco_list:
         tmp_score = stu.score
-        if tmp_score < 60:
+        if tmp_score < 60:  # calculate gpa
             tmp_gpa = 0
         else:
             tmp_gpa = (tmp_score - 60) / 10 + 1.5
             if tmp_gpa > 5:
                 tmp_gpa = 5
-        tmp_node = {
-            'studentID': stu.student_id.id,
-            'studentName': stu.student_id.name,
-            'score': tmp_score,
-            "gradePoint": tmp_gpa
+        tmp_node = {  # generate node for list
+                      'studentID': stu.student_id.id,
+                      'studentName': stu.student_id.name,
+                      'score': tmp_score,
+                      "gradePoint": tmp_gpa
         }
         ret_list.append(tmp_node)
     print(ret_list)
@@ -315,15 +319,15 @@ def b_score_modification(c_id, s_id, score, reason):
     :param reason:
     :return:
     """
-    cla = Class_info.objects.get(class_id=c_id)
-    stu = Student_user.objects.get(id=s_id)
+    cla = Class_info.objects.get(class_id=c_id)  # get class_info object
+    stu = Student_user.objects.get(id=s_id)  # get student_user object
     from_fac = Faculty_user.objects.filter(name=cla.teacher).first()
     s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id).first()
     print(s.score)
     print(s.class_id)
     print(s.student_id)
     old_score = s.score
-    chief_faculty = cla.course_id.chief_faculty
+    chief_faculty = cla.course_id.chief_faculty  # generate a new message
     update_message = MessageTable.objects.create(from_faculty_id=from_fac,
                                                  to_faculty_id=chief_faculty,
                                                  student_id=stu, class_id=cla,
@@ -345,21 +349,21 @@ def db_query_modify_info(faculty_id):
     modify_node = []
     audit_node = []
     for rec in modify_list:
-        if rec.status == 0:             # prevent malicious hacking in js level
+        if rec.status == 0:  # prevent malicious hacking in js level
             tmp_status = 'pending'
         elif rec.status == 1:
             tmp_status = 'reject'
         else:
             tmp_status = 'admit'
-        temp_node = {
-            'messageID': rec.id,
-            'className': rec.class_id.course_id.name,
-            'studentID': rec.student_id.id,
-            'studentName': rec.student_id.name,
-            'old_score': rec.old_score,
-            'new_score': rec.new_score,
-            'reason': rec.reason,
-            'status': tmp_status
+        temp_node = {  # generate node
+                       'messageID': rec.id,
+                       'className': rec.class_id.course_id.name,
+                       'studentID': rec.student_id.id,
+                       'studentName': rec.student_id.name,
+                       'old_score': rec.old_score,
+                       'new_score': rec.new_score,
+                       'reason': rec.reason,
+                       'status': tmp_status
         }
         modify_node.append(temp_node)
     # print(modify_node)
@@ -410,15 +414,15 @@ def b_sanction_result(requst, msg_id, status):
         l = MessageTable.objects.get(id=msg_id)
         if status == '1':
             l.status = 2
-            l.save()
+            l.save()  # update status as 'admitted'
             rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
                                             student_id=l.student_id.id).first()
             rec.score = l.new_score
-            rec.save()
+            rec.save()  # change score
             return HttpResponse(u'审核成功，成绩将被修改')
         elif status == '0':
             l.status = 1
-            l.save()
+            l.save()  # update status as 'rejected'
             return HttpResponse(u'审核成功，成绩不同意被修改')
     except:
         return HttpResponse(u'非法记录号')
@@ -439,14 +443,12 @@ def b_final_commit(request, c_id):
         if is_exist is None:
             return HttpResponse(u'成绩未上传！')
         score_list = TempTable.objects.filter(class_id=cla.class_id)
-        for rec in score_list:
+        for rec in score_list:  # move score records to ScoreTable
             ScoreTable.objects.create(class_id=rec.class_id,
                                       student_id=rec.student_id,
                                       score=rec.score)
         TempTable.objects.filter(class_id=cla.class_id).delete()
         return HttpResponse(u'提交成功！')
-
-
 
 
 from django.shortcuts import render, render_to_response
@@ -492,7 +494,6 @@ def upload_xlsx(request, c_id='0000000001'):
         uf = XlsxForm()
     return render_to_response('score_commit.html', {'uf': uf})
     # return render(request, 'score_commit.html')
-
 
 
 def download_xlsx(request, c_id):

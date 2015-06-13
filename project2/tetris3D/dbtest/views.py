@@ -243,7 +243,6 @@ def b_teacher_temp_query(request):
     return HttpResponse(json.dumps(faculty_class_query(request.user.username,  True)), content_type="application/json")
 
 
-
 def faculty_class_query(f_id, is_temp):
     """
     authentication check in need
@@ -415,13 +414,38 @@ def b_sanction_result(requst, msg_id, status):
                                             student_id=l.student_id.id).first()
             rec.score = l.new_score
             rec.save()
-            return HttpResponse('Audit Done, Score modified.')
+            return HttpResponse(u'审核成功，成绩将被修改')
         elif status == '0':
             l.status = 1
             l.save()
-            return HttpResponse('Audit Done, Score will not change.')
+            return HttpResponse(u'审核成功，成绩不同意被修改')
     except:
-        return HttpResponse('invalid record id.')
+        return HttpResponse(u'非法记录号')
+
+
+def b_final_commit(request, c_id):
+    """
+    Operations on `final commit` from a faculty, in class level
+    :param c_id: class_id
+    :return:
+    """
+    fac = Faculty_user.objects.filter(id=request.user.username).first()
+    cla = Class_info.objects.filter(class_id=c_id).first()
+    if cla.teacher != fac.name:
+        return HttpResponse(u'未授权请求!')
+    else:
+        is_exist = TempTable.objects.filter(class_id=cla.class_id).first()
+        if is_exist is None:
+            return HttpResponse(u'成绩未上传！')
+        score_list = TempTable.objects.filter(class_id=cla.class_id)
+        for rec in score_list:
+            ScoreTable.objects.create(class_id=rec.class_id,
+                                      student_id=rec.student_id,
+                                      score=rec.score)
+        TempTable.objects.filter(class_id=cla.class_id).delete()
+        return HttpResponse(u'提交成功！')
+
+
 
 
 from django.shortcuts import render, render_to_response

@@ -409,7 +409,7 @@ class XlsxForm(forms.Form):
 import os
 
 
-def upload_xlsx(request, c_id='0000000001'):
+def upload_xlsx(request, c_id):
     upload_dir = './upload/'
 
     if request.method == "POST":
@@ -430,7 +430,7 @@ def upload_xlsx(request, c_id='0000000001'):
             if not os.path.exists(upload_dir):
                 os.mkdir(upload_dir)
 
-            update_score(upload_dir + '{}'.format(orig_filename))
+            update_score(upload_dir + '{}'.format(orig_filename), c_id)
             os.remove(upload_dir + '{}'.format(orig_filename))
             return HttpResponse('upload ok!')
     else:

@@ -135,16 +135,27 @@ function updateInfo(data,values){   //update the student scores
     info[5] = d3.median(values);
     // 方差
     info[6] = d3.variance(values);
+
+    console.log(info);
     d3.select("#infoTable").selectAll("tr").remove();   // remove old score information
     d3.select("#infoTable").selectAll("tr")
         .data([info])
         .enter().append("tr")
         .html(function (d) {
-        str = d.map(function(d){return "<td>" + d.toFixed(2) + "</td>";}).join('')  // 2位小数
+        str = d.map(function(d){return "<td>" + dispNum(d) + "</td>";}).join('')  // 2位小数
         return str;
     });
 }
-
+function dispNum(d){
+    var str;
+    try{
+        str = d.toFixed(2);
+    }catch(err){
+        console.log(err);
+        str = '无统计信息';
+    }
+    return str;
+}
 function updateTable(data) { // update student's transcript 
     d3.select("#scoreTable").selectAll("tr").remove();
     d3.select("#scoreTable").selectAll("tr")

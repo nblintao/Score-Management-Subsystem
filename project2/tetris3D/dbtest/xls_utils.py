@@ -135,7 +135,8 @@ def update_score(xlsx_filename, c_id):
     if c_id == xlsx_info.class_id:
         return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
     else:
-        return "The class id mentioned in the uploaded file doesn't match your\
- selected class. Update failed."
+        # return "The class id mentioned in the uploaded file doesn't match your\
+ # selected class. Update failed."
+        return '文件中的课程编号与选择的不符，上传失败。'
 
 

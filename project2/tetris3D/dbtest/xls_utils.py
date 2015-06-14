@@ -37,12 +37,14 @@ def parse_xlsx(xlsx_filename):
         if ws['F3'].value is not None:
             class_id = ws['F3'].value
         else:
-            print('[Syntax Error] course id not found!')
-            return
+            xlsx_info.error_str = '[格式错误] 课程编号未填写!'
+            xlsx_info.error_code = 3
+            return xlsx_info
         print('ok!')
     else:
-        print('wrong format!')
-        return
+        xlsx_info.error_str = '[格式错误] 未知格式错误，您可能更改了模板xlsx文件的文本格式!'
+        xlsx_info.error_code = 3
+        return xlsx_info
 
     # the default start row for score information
     start_row = DEFAULT_SCORE_START_ROW

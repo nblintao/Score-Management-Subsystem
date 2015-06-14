@@ -228,7 +228,6 @@ def temp_table_update(c_id, score_list):
                 return HttpResponse(u'非法班级号或学号')
 
 
-
 def b_teacher_query(request):
     """
     Respond to the browser request with committed score records
@@ -236,7 +235,8 @@ def b_teacher_query(request):
     :return: json file
     """
     print(request.user.username)
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username, False)), content_type="application/json")
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username, False)),
+                        content_type="application/json")
 
 
 def b_teacher_temp_query(request):
@@ -245,7 +245,8 @@ def b_teacher_temp_query(request):
     :param request: the request object from the browser
     :return: json file
     """
-    return HttpResponse(json.dumps(faculty_class_query(request.user.username, True)), content_type="application/json")
+    return HttpResponse(json.dumps(faculty_class_query(request.user.username, True)),
+                        content_type="application/json")
 
 
 def faculty_class_query(f_id, is_temp):
@@ -277,7 +278,17 @@ def faculty_class_query(f_id, is_temp):
     return info_list
 
 
-def b_score_query(c_id):
+def b_temp_class_score_query(c_id):
+    return HttpResponse(json.dumps(db_score_query(c_id, True)),
+                        content_type="application/json")
+
+
+def b_final_class_score_query(c_id):
+    return HttpResponse(json.dumps(db_score_query(c_id, False)),
+                        content_type="application/json")
+
+
+def db_score_query(c_id, is_temp):
     """
     Session and authentication check in need
     Responde to front-end score qurey
@@ -285,7 +296,10 @@ def b_score_query(c_id):
     :return: json file
     """
     ret_list = []
-    sco_list = ScoreTable.objects.filter(class_id=c_id)
+    if is_temp:
+        sco_list = TempTable.objects.filter(class_id=c_id)
+    else:
+        sco_list = ScoreTable.objects.filter(class_id=c_id)
     # print(sco_list)
     for stu in sco_list:
         tmp_score = stu.score
@@ -303,7 +317,8 @@ def b_score_query(c_id):
         }
         ret_list.append(tmp_node)
     print(ret_list)
-    return HttpResponse(json.dumps(ret_list), content_type="application/json")
+    return ret_list
+    # return HttpResponse(json.dumps(ret_list), content_type="application/json")
 
 
 def B_score_modification(request):

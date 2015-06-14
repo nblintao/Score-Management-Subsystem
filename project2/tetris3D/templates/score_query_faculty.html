@@ -144,7 +144,7 @@ function updateInfoTable(data){
 
 function updateClassScore(classID){
     console.log(classID);
-    d3.json("/SM/B_temp_table_query/"+classID,function(data){   // 根据classID获取成绩表
+    d3.json("/SM/B_final_class_score_query/"+classID,function(data){   // 根据classID获取成绩表
         // console.log(data);
         var values = data.map(function(d){return d.score;});
         d3.select("#studentScore").selectAll("tr").remove();    // clear old infomation

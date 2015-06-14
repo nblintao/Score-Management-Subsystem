@@ -281,7 +281,7 @@ function updateInfoTable(data){ // update the course informtion
 function updateClassScore(classID){ // update the transcripts 
 
     console.log(classID);
-    d3.json("/SM/B_temp_table_query/"+classID,function(data){   // retreive data from back end
+    d3.json("/SM/B_final_class_score_query/"+classID,function(data){   // retreive data from back end
         // console.log(data);
         d3.select("#studentScore").selectAll("tr").remove();
         d3.select("#studentScore").selectAll("tr")

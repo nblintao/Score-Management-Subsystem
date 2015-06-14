@@ -543,7 +543,7 @@ def upload_xlsx(request, c_id):
                 return HttpResponse(hr)
             # else:
             # return HttpResponse('upload ok!')
-            return HttpResponse('upload ok!')
+            return HttpResponse('上传成功！')
     else:
         uf = XlsxForm()
     return render_to_response('score_commit.html', {'uf': uf})

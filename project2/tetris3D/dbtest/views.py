@@ -294,12 +294,12 @@ def faculty_class_query(f_id, is_temp):
     return info_list
 
 
-def b_temp_class_score_query(c_id):
+def b_temp_class_score_query(request, c_id):
     return HttpResponse(json.dumps(db_score_query(c_id, True)),
                         content_type="application/json")
 
 
-def b_final_class_score_query(c_id):
+def b_final_class_score_query(request, c_id):
     return HttpResponse(json.dumps(db_score_query(c_id, False)),
                         content_type="application/json")
 
@@ -549,6 +549,8 @@ def upload_xlsx(request, c_id):
     return render_to_response('score_commit.html', {'uf': uf})
     # return render(request, 'score_commit.html')
 
+import random
+import string
 
 def download_xlsx(request, c_id):
     download_dir = './download/'
@@ -563,6 +565,8 @@ def download_xlsx(request, c_id):
 
     response = HttpResponse(c)
     response['Content-Type'] = 'application/octet_stream'
-    response['Content-Disposition'] = 'attachment; filename="sample.xlsx"'
+
+    salt = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+    response['Content-Disposition'] = 'attachment; filename="sample_'+ salt +'.xlsx"'
 
     return response 

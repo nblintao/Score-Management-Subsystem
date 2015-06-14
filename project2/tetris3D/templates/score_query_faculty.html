@@ -107,7 +107,7 @@
 			</div>           
         </div>
 
-        <div class="col-md-5" id="histo"></div>
+        <div class="col-md-5" id="histo"></div>     <!-- draw the histogram -->
 
     </div>
         
@@ -116,7 +116,7 @@
  
 <script type="text/javascript">
 
-    d3.json('/SM/B_teacher_query',function(data){
+    d3.json('/SM/B_teacher_query',function(data){   // 从后端获取教职工授课的信息
      // console.log(data);
         coursesInfo = data;
         updateInfoTable(data);
@@ -127,7 +127,7 @@ var studentScore;
 
 function updateInfoTable(data){
 
-    d3.select("#infoTable").selectAll("tr").remove();
+    d3.select("#infoTable").selectAll("tr").remove();   // remove old
     d3.select("#infoTable").selectAll("tr")
         .data(data)
         .enter().append("tr")
@@ -137,17 +137,17 @@ function updateInfoTable(data){
             str += "<td>" + d.courseName + "</td>";
             str += "<td>" + d.credits + "</td>";
             str += "<td>" + d.classTime + "</td>";
-            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\')">' + "查看此课" + "</button></td>";
+            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\')">' + "查看此课" + "</button></td>"; // 单击查看此课，对成绩表进行更新
             return str;
         });
 }
 
 function updateClassScore(classID){
     console.log(classID);
-    d3.json("/SM/B_temp_table_query/"+classID,function(data){
+    d3.json("/SM/B_temp_table_query/"+classID,function(data){   // 根据classID获取成绩表
         // console.log(data);
         var values = data.map(function(d){return d.score;});
-        d3.select("#studentScore").selectAll("tr").remove();
+        d3.select("#studentScore").selectAll("tr").remove();    // clear old infomation
         d3.select("#studentScore").selectAll("tr")
             .data(data)
             .enter().append("tr")
@@ -160,12 +160,12 @@ function updateClassScore(classID){
             return str;
         });
         studentScore = data;
-        updateStatInfo(data);
+        updateStatInfo(data);   // call updateStatInfo to update the statistical information
         drawHisto(values);
     })
 }
 
-function updateStatInfo(data){
+function updateStatInfo(data){  // 生成成绩表对应的统计信息
     var stat = [];
     var values = data.map(function(d){return d.score;});
     // 平均分
@@ -182,7 +182,7 @@ function updateStatInfo(data){
         .data([stat])
         .enter().append("tr")
         .html(function (d) {
-        str = d.map(function(d){return "<td>" + d.toFixed(2) + "</td>";}).join('')
+        str = d.map(function(d){return "<td>" + d.toFixed(2) + "</td>";}).join('')  // 保留2位小数
         return str;
     });
 }
@@ -191,7 +191,7 @@ function updateStatInfo(data){
 
 <script type="text/javascript">
     // Generate a Bates distribution of 10 random variables.
-function drawHisto (values) {
+function drawHisto (values) {   // draw the histogram
 
 // var values = d3.range(1000).map(d3.random.bates(10));
 
@@ -229,31 +229,31 @@ var xAxis = d3.svg.axis()
 
 d3.select("#histo").selectAll("svg").remove();	// clear old graph
 
-var svg = d3.select("#histo").append("svg")
+var svg = d3.select("#histo").append("svg")     // set margin
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var bar = svg.selectAll(".bar")
+var bar = svg.selectAll(".bar") // append date to bar group
     .data(data)
-  .enter().append("g")
+    .enter().append("g")
     .attr("class", "bar")
     .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
 
-bar.append("rect")
+bar.append("rect")  // 绘制柱状图的柱子
     .attr("x", 1)
     .attr("width", x(data[0].dx) - 1)
     .attr("height", function(d) { return height - y(d.y); });
 
-bar.append("text")
+bar.append("text")  // draw the label
     .attr("dy", ".75em")
     .attr("y", 6)
     .attr("x", x(data[0].dx) / 2)
     .attr("text-anchor", "middle")
     .text(function(d) { return formatCount(d.y); });
 
-svg.append("g")
+svg.append("g") // draw axis
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis);

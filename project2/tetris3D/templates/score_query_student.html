@@ -95,19 +95,19 @@
     //     Param='/SM/B_teacher_query/'+'{{ id }}';
     // }
     // d3.json(Param,function(data){
-    d3.json('/SM/B_student_query',function(data){
+    d3.json('/SM/B_student_query',function(data){   // retrieve all the score information of logined student
         var values = data.map(function(d){return d.score;});
-        updateTable(data);
-        drawHisto(values);
-        updateInfo(data,values);
+        updateTable(data);  // call funttion to update the student scores
+        drawHisto(values);  // call function to update the histogram
+        updateInfo(data,values);    // call function to update its statistical information
     })
 
 
-function updateInfo(data,values){
+function updateInfo(data,values){   //update the student scores
     var info = [];
     var totalCredit = 0, totalGradePoint = 0;
     // 总学分    
-    for (var i = data.length - 1; i >= 0; i--) {
+    for (var i = data.length - 1; i >= 0; i--) {    // calculate GPA
         var d = data[i];
         totalCredit += d.credit;
         totalGradePoint += d.credit * d.score;
@@ -135,28 +135,28 @@ function updateInfo(data,values){
     info[5] = d3.median(values);
     // 方差
     info[6] = d3.variance(values);
-    d3.select("#infoTable").selectAll("tr").remove();
+    d3.select("#infoTable").selectAll("tr").remove();   // remove old score information
     d3.select("#infoTable").selectAll("tr")
         .data([info])
         .enter().append("tr")
         .html(function (d) {
-        str = d.map(function(d){return "<td>" + d.toFixed(2) + "</td>";}).join('')
+        str = d.map(function(d){return "<td>" + d.toFixed(2) + "</td>";}).join('')  // 2位小数
         return str;
     });
 }
 
-function updateTable(data) {
+function updateTable(data) { // update student's transcript 
     d3.select("#scoreTable").selectAll("tr").remove();
     d3.select("#scoreTable").selectAll("tr")
         .data(data)
         .enter().append("tr")
         .html(function (d) {
         str = '';
-        str += "<td>" + d.courseID + "</td>";
-        str += "<td>" + d.courseName + "</td>";
-        str += "<td>" + d.score + "</td>";
-        str += "<td>" + d.credit + "</td>";
-        str += "<td>" + d.gradePoint + "</td>";
+        str += "<td>" + d.courseID + "</td>";   // 课程号
+        str += "<td>" + d.courseName + "</td>";     // 课程名称
+        str += "<td>" + d.score + "</td>";  // 成绩
+        str += "<td>" + d.credit + "</td>"; // 学分
+        str += "<td>" + d.gradePoint + "</td>"; // 绩点
         return str;
     });
 }
@@ -164,7 +164,7 @@ function updateTable(data) {
 
 <script type="text/javascript">
     // Generate a Bates distribution of 10 random variables.
-function drawHisto (values) {
+function drawHisto (values) {   // draw histogram of the distribution of scores
 
 // var values = d3.range(1000).map(d3.random.bates(10));
 
@@ -200,31 +200,31 @@ var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom");
 
-var svg = d3.select("#histo").append("svg")
+var svg = d3.select("#histo").append("svg") // set margin
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var bar = svg.selectAll(".bar")
+var bar = svg.selectAll(".bar")     // set bar group
     .data(data)
   .enter().append("g")
     .attr("class", "bar")
     .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
 
-bar.append("rect")
+bar.append("rect")  // draw the rectangle representing data
     .attr("x", 1)
     .attr("width", x(data[0].dx) - 1)
     .attr("height", function(d) { return height - y(d.y); });
 
-bar.append("text")
+bar.append("text")  // set label
     .attr("dy", ".75em")
     .attr("y", 6)
     .attr("x", x(data[0].dx) / 2)
     .attr("text-anchor", "middle")
     .text(function(d) { return formatCount(d.y); });
 
-svg.append("g")
+svg.append("g") // set axis
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis);

@@ -196,19 +196,19 @@
 
 <script type="text/javascript">
 
-d3.json("B_query_modify_info",function(data){
+d3.json("B_query_modify_info",function(data){   // retrieve modification request from back end
     // console.log(data);
     // data = [ [{'new_score': 88.5, 'studentName': 'zhazha', 'messageID': 5, 'old_score': 66.5, 'studentID': '0000000001', 'status': 'reject', 'reason': '123', 'className': 'firstclass'}, {'new_score': 60.5, 'studentName': 'lalala', 'messageID': 6, 'old_score': 60.5, 'studentID': '0000000003', 'status': 'admit', 'reason': '原因是什么我也不知道', 'className': 'thirdclass'}, {'new_score': 60.5, 'studentName': 'lalala', 'messageID': 66, 'old_score': 60.5, 'studentID': '0000000003', 'status': 'pending', 'reason': '原因是什么我也不知道', 'className': 'thirdclass'}],[{'new_score': 60.5, 'studentName': 'lalala', 'messageID': 6, 'old_score': 60.5, 'studentID': '0000000003', 'status': 'pending', 'reason': 'ppp么我也不知道','className': 'thirdclass'}]];
-    d3.select('#modifyInfoTable').selectAll("tr").remove();
+    d3.select('#modifyInfoTable').selectAll("tr").remove(); // remove the old information of modification
     // // modify_list
     // addModifyInfoTable(data[0], 'modify');
     // // audit_list
     // addModifyInfoTable(data[1], 'audit');
-    modifyData = data[0].map(function(d){d.type='modify';return d;});
-    auditData = data[1].map(function(d){d.type='audit';return d;});
+    modifyData = data[0].map(function(d){d.type='modify';return d;});   // 发出请求的反馈结果
+    auditData = data[1].map(function(d){d.type='audit';return d;}); // 审核别人的请求
     data = modifyData.concat(auditData);
     console.log(data);
-    d3.select("#modifyInfoTable").selectAll("tr")
+    d3.select("#modifyInfoTable").selectAll("tr")   // update the information of modification request
     .data(data)
     .enter().append("tr")
     .html(function(d){
@@ -225,7 +225,7 @@ d3.json("B_query_modify_info",function(data){
     });    
 })
 
-function generateIcon(mess){
+function generateIcon(mess){    // generate the icons for each state of modification request
     if(mess.type == 'modify'){
         switch(mess.status){
             case 'admit':
@@ -252,7 +252,7 @@ function generateIcon(mess){
     }
 }
 
-    d3.json('/SM/B_teacher_query',function(data){
+    d3.json('/SM/B_teacher_query',function(data){   // retrieve the course informtion of logined teacher from back end
      // console.log(data);
         coursesInfo = data;
         updateInfoTable(data);
@@ -261,9 +261,9 @@ function generateIcon(mess){
 var coursesInfo;
 var studentScore;
 
-function updateInfoTable(data){
+function updateInfoTable(data){ // update the course informtion
 
-    d3.select("#infoTable").selectAll("tr").remove();
+    d3.select("#infoTable").selectAll("tr").remove();   // remove old
     d3.select("#infoTable").selectAll("tr")
         .data(data)
         .enter().append("tr")
@@ -273,15 +273,15 @@ function updateInfoTable(data){
             str += "<td>" + d.courseName + "</td>";
             str += "<td>" + d.credits + "</td>";
             str += "<td>" + d.classTime + "</td>";
-            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\')">' + "修改此课" + "</button></td>";
+            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\')">' + "修改此课" + "</button></td>"; // once click on the button, update the transcripts of students
             return str;
         });
 }
 
-function updateClassScore(classID){
+function updateClassScore(classID){ // update the transcripts 
 
     console.log(classID);
-    d3.json("/SM/B_temp_table_query/"+classID,function(data){
+    d3.json("/SM/B_temp_table_query/"+classID,function(data){   // retreive data from back end
         // console.log(data);
         d3.select("#studentScore").selectAll("tr").remove();
         d3.select("#studentScore").selectAll("tr")
@@ -293,19 +293,19 @@ function updateClassScore(classID){
             str += "<td>" + d.studentName + "</td>";
             str += "<td>" + d.score + "</td>";
             str += "<td>" + d.gradePoint + "</td>";
-            str += '<td><button class="btn btn-default btn-sm" onclick="createForm(\'' + classID + '\' , \'' + d.studentID + '\')">修改此成绩</button></td>';
+            str += '<td><button class="btn btn-default btn-sm" onclick="createForm(\'' + classID + '\' , \'' + d.studentID + '\')">修改此成绩</button></td>'; // once click on the button, generate request form
             return str;
         });
         studentScore = data;
-        updateStatInfo(data);
+        updateStatInfo(data);   // update the statistical information of selected class
     })
 }
 
-function updateStatInfo(data){
+function updateStatInfo(data){  // calculate mean, min, max, median and variance of students
     var stat = [];
     var values = data.map(function(d){return d.score;});
     // 平均分
-    stat[0] = d3.mean(values);
+    stat[0] = d3.mean(values); 
     // 最低分
     stat[1] = d3.min(values);
     // 最高分
@@ -313,7 +313,7 @@ function updateStatInfo(data){
     stat[3] = d3.median(values);
     stat[4] = d3.variance(values);
 
-    d3.select("#statInfo").selectAll("tr").remove();
+    d3.select("#statInfo").selectAll("tr").remove();   // remove old
     d3.select("#statInfo").selectAll("tr")
         .data([stat])
         .enter().append("tr")
@@ -323,7 +323,7 @@ function updateStatInfo(data){
     });
 }
 
-function createForm(classID, studentID){
+function createForm(classID, studentID){    // generate a new request form
     
     console.log(classID);
     console.log(studentID);
@@ -334,7 +334,7 @@ function createForm(classID, studentID){
 
     var i;
     var cTmp;
-    for (i = coursesInfo.length - 1; i >= 0; i--) {
+    for (i = coursesInfo.length - 1; i >= 0; i--) { // 若选择修改的记录与现在显示的一致，则break 
         cTmp = coursesInfo[i];
         if(cTmp.classID == classID)
             break;
@@ -343,7 +343,7 @@ function createForm(classID, studentID){
     form[1] = coursesInfo[i].courseName;
 
     var sTmp;
-    for (i = studentScore.length - 1; i >= 0; i--) {
+    for (i = studentScore.length - 1; i >= 0; i--) { // 若选择修改的记录与现在显示的一致，则break 
         sTmp = studentScore[i];
         if(sTmp.studentID == studentID)
             break;
@@ -354,6 +354,7 @@ function createForm(classID, studentID){
 
     console.log([form]);
 
+    // modify the form in html
     document.getElementById('InputCourseID').innerHTML = '<label for="InputCourseID">教学班号</label><input type="text" class="form-control" readonly="readonly" value="' + form[0] + '">';
     document.getElementById('InputCourseName').innerHTML = '<label for="InputCourseName">课程名称</label><input type="text" class="form-control"readonly="readonly" value="' + form[1] + '">';
     document.getElementById('InputStudentID').innerHTML = '<label for="InputStudentID">学生学号</label><input type="text" class="form-control"readonly="readonly" value="' + form[2] + '">';

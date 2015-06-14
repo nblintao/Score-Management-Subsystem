@@ -79,8 +79,11 @@ def parse_xlsx(xlsx_filename):
         score_info.append(row_info)
 
     xlsx_info.class_id = class_id 
-    xlsx_info.score_info = score_info
+    xlsx_info.scores = score_info
 
+#    print('after parse')
+#    print(xlsx_info.class_id)
+#    print(xlsx_info.score_info)
     return xlsx_info
 
 import os

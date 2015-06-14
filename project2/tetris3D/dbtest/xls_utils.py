@@ -151,12 +151,12 @@ def update_score(xlsx_filename, c_id):
     print("xlsx_info.class_id")
     print(xlsx_info.class_id)
 
+    if xlsx_info.error_code is not 0:
+        return xlsx_info.error_str
+
     # check if the class_id in xlsx file match (front-end)selected c_id 
     if c_id == xlsx_info.class_id:
-        if xlsx_info.error_code is not 0:
-            return xlsx_info.error_str
-        else:
-            return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+        return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
     else:
         # return "The class id mentioned in the uploaded file doesn't match your\
  # selected class. Update failed."

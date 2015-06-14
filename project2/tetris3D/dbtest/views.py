@@ -506,6 +506,7 @@ from dbtest.xls_utils import update_score, get_demo_xlsx
 # Create your views here.
 
 
+# temp database field to store xlsx file
 class XlsxForm(forms.Form):
     xlsx_file = forms.FileField()
 
@@ -513,20 +514,24 @@ class XlsxForm(forms.Form):
 import os
 
 
+# get the file uploaded from user
 def upload_xlsx(request, c_id):
     upload_dir = './upload/'
 
+    # if really an upload
     if request.method == "POST":
         print(request.POST)
         print(request.FILES)
 
+        # get the request's POST and FILES
         uf = XlsxForm(request.POST, request.FILES)
         if uf.is_valid():
             xlsx_file = uf.cleaned_data['xlsx_file']
 
+            # get the original filename
             orig_filename = request.FILES['xlsx_file'].name
-            # print(orig_filename)
 
+            # temporarily store the file
             user = User()
             user.xlsx_file = xlsx_file
             user.save("{}.xlsx".format(orig_filename))
@@ -534,11 +539,14 @@ def upload_xlsx(request, c_id):
             if not os.path.exists(upload_dir):
                 os.mkdir(upload_dir)
 
+            # update the score using the temp file
             hr = update_score(upload_dir + '{}'.format(orig_filename), c_id)
+            # remove the temp file
             try:
                 os.remove(upload_dir + '{}'.format(orig_filename))
             except:
                 print("Cannot remove file" + upload_dir + '{}'.format(orig_filename))
+
             if hr:
                 return HttpResponse(hr)
             # else:
@@ -546,6 +554,7 @@ def upload_xlsx(request, c_id):
             return HttpResponse('上传成功！')
     else:
         uf = XlsxForm()
+
     return render_to_response('score_commit.html', {'uf': uf})
     # return render(request, 'score_commit.html')
 
@@ -553,13 +562,14 @@ import random
 import string
 
 def download_xlsx(request, c_id):
+    """
+    download the demo xlsx file with existing scores
+    """
     download_dir = './download/'
-
-    # if request.method is 'GET':
-    # print(request.GET)
 
     get_demo_xlsx(c_id)
 
+    # open the file in binary read-only mode
     with open(download_dir + '/demo.xlsx', 'rb') as file:
         c = file.read()
 

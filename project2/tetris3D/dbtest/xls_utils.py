@@ -74,9 +74,7 @@ def get_demo_xlsx(course_id):
     ws = wb.active
     ws.title = 'score sheet 1'
 
-    # todo: should get course id from front-end
     student_info = class_info_query(course_id)
-    # student_info = views.class_info_query(course_id)
 
 
     # Formatting
@@ -111,20 +109,29 @@ def get_demo_xlsx(course_id):
     # Save the file
     ws.page_setup.fitToWidth = 1
 
+    # make sure the download dir exists
     download_dir = './download/'
     if not os.path.exists(download_dir):
         os.mkdir(download_dir)
 
+    # and save the file for download
     wb.save(download_dir + "demo.xlsx")
 
 
 def update_score(xlsx_filename, c_id):
+    """
+    use the file uploaded by the user to update database
+    """
+
+    # parse the xlsx file
     xlsx_info = parse_xlsx(xlsx_filename)
-    # views.temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+
     print('cid')
     print(c_id)
     print("xlsx_info.class_id")
     print(xlsx_info.class_id)
+
+    # check if the class_id in xlsx file match (front-end)selected c_id 
     if c_id == xlsx_info.class_id:
         return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
     else:
@@ -132,6 +139,3 @@ def update_score(xlsx_filename, c_id):
  selected class. Update failed."
 
 
-# get_demo_xlsx()
-# xlsx_info = parse_xlsx('sample.xlsx')
-# print(xlsx_info.scores)

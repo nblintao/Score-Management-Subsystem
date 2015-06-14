@@ -4,3 +4,5 @@
 *.pyc
 .DS_Store
 .idea/
+/project2/tetris3D/download
+/project2/tetris3D/upload

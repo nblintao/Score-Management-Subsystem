@@ -13,11 +13,13 @@ class XlsxInfo:
     """
     XlsxInfo class is used to store information in xlsx file used by score system 
     """
-    def __init__(self, _class_id, _scores):
+    def __init__(self, _class_id=None, _scores=None):
         # each teacher teaching a course has a unique class_id
         self.class_id = _class_id
         # all the scores for this class
         self.scores = _scores
+        self.error_code = 0
+        self.warning_code = 0
 
 
 # parse the 'xlsx_filename' file in the format of XlsxInfo
@@ -27,11 +29,13 @@ def parse_xlsx(xlsx_filename):
     # get the active worksheet(ws) from xlsx workbook
     ws = wb.active
 
+    xlsx_info = XlsxInfo()
+
     # check whether the syntax remains the same from demo.xlsx
     if ws['A5'].value == '学号':
         # and str(ws['A6'].value).startswith('31')
         if ws['F3'].value is not None:
-            course_id = ws['F3'].value
+            class_id = ws['F3'].value
         else:
             print('[Syntax Error] course id not found!')
             return
@@ -44,14 +48,20 @@ def parse_xlsx(xlsx_filename):
     start_row = DEFAULT_SCORE_START_ROW
     # get the end row of score information
     end_row = ws.get_highest_row()
+    print('highest row {}'.format(end_row))
     score_info = []
     for row in range(start_row, end_row + 1):
+        print('now processing row {}.'.format(row))
         # if studentID is not specified then skip it, not care about studentName
         if ws['A{}'.format(row)].value is None :
-            print('row {} in xlsx file: student id not specified.'.format(row))
+            xlsx_info.error_code = 1
+            xlsx_info.error_str = '第{}行: 学生学号不正确.'.format(row)
+            print(xlsx_info.error_str)
             continue 
+
         # if score is not specified then skip it.
         if ws['C{}'.format(row)].value is None :
+            xlsx_info.warning_code = 2
             print('row {} in xlsx file: student {}\'s score not specified.'\
                     .format(row, ws['A{}'.format(row)].value))
             continue
@@ -59,14 +69,19 @@ def parse_xlsx(xlsx_filename):
         try:
             row_info = {'studentID': ws['A{}'.format(row)].value, 'score': float(ws['C{}'.format(row)].value)}
         except ValueError:
-            print('row {}: score is not a float number.'.format(row)) 
+            xlsx_info.error_code = 2    
+            # xlsx_info.error_str = 'row {}: score is not a float number.'.format(row)
+            xlsx_info.error_str = '第{}行: 成绩不是一个有效的数字.'.format(row)
+            print(xlsx_info.error_str) 
             continue
 
-        # print(row_info)
+        print(row_info)
         score_info.append(row_info)
 
-    return XlsxInfo(course_id, score_info)
+    xlsx_info.class_id = class_id 
+    xlsx_info.score_info = score_info
 
+    return xlsx_info
 
 import os
 def get_demo_xlsx(course_id):
@@ -133,7 +148,10 @@ def update_score(xlsx_filename, c_id):
 
     # check if the class_id in xlsx file match (front-end)selected c_id 
     if c_id == xlsx_info.class_id:
-        return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+        if xlsx_info.error_code is not 0:
+            return xlsx_info.error_str
+        else:
+            return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
     else:
         return "The class id mentioned in the uploaded file doesn't match your\
  selected class. Update failed."

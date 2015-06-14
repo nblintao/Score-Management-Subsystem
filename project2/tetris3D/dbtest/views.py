@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Context, loader
+from django import forms
 from .models import ScoreTable, TempTable, MessageTable, \
     Course_info, Class_info, class_table, \
     Student_user, Faculty_user
@@ -318,8 +319,25 @@ def b_score_query(c_id):
     return HttpResponse(json.dumps(ret_list), content_type="application/json")
 
 
-def B_score_modification(request):
+class ModifyForm(forms.Form):
+    classID = forms.DateField()
+    studentID = forms.DateField()
+    newScore = forms.DateField()
+    modifyReason = forms.DateField()
+
+
+
+def B_score_modification(request, c_id, s_id):
     print("B_score_modification")
+    score = request.POST['newScore']
+    reason = request.POST['modifyReason']
+    print([c_id, s_id, score, reason])
+    # print(request.POST)
+    # mf = ModifyForm(request.POST)
+    # print(mf.is_valid())
+    # print(mf)
+    b_score_modification(c_id, s_id, score, reason)
+    return HttpResponse("上传成功")
 
 
 def b_score_modification(c_id, s_id, score, reason):

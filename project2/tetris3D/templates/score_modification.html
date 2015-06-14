@@ -159,7 +159,7 @@
                         {% csrf_token %}
                         <div class="form-group" id="InputCourseID">
                             <label for="InputCourseID">教学班号</label>
-                            <input name="classID" type="text" class="form-control" readonly="readonly" value="">
+                            <input name="classID" id="id_classID" type="text" class="form-control" readonly="readonly" value="">
                         </div>
                         <div class="form-group" id="InputCourseName" >
                             <label for="InputCourseName">课程名称</label>
@@ -167,7 +167,7 @@
                         </div>
                         <div class="form-group" id="InputStudentID">
                             <label for="InputStudentID">学生学号</label>
-                            <input name="studentID" type="text" class="form-control"readonly="readonly" value="">
+                            <input name="studentID" id="id_studentID" type="text" class="form-control"readonly="readonly" value="">
                         </div>                  
                         <div class="form-group" id="InputStudentName">
                             <label for="InputStudentName">学生姓名</label>
@@ -179,11 +179,11 @@
                         </div>
                         <div class="form-group" id="InputNewScore">
                             <label for="InputNewScore">新成绩</label>
-                            <input name="newScore" type="text" class="form-control" id="InputNewScore">
+                            <input name="newScore" id="id_newScore" type="text" class="form-control" id="InputNewScore">
                         </div>
                         <div class="form-group" id="InputReason">
                             <label for="InputNewScore">理由</label>
-                            <input name="modifyReason"  type="text" class="form-control" id="InputReason">
+                            <input name="modifyReason" id="id_modifyReason"  type="text" class="form-control" id="InputReason">
                         </div>
 
                         <button type="submit" class="btn btn-default" value="submit">提交修改</button>
@@ -359,6 +359,7 @@ function createForm(classID, studentID){
     document.getElementById('InputStudentID').innerHTML = '<label for="InputStudentID">学生学号</label><input type="text" class="form-control"readonly="readonly" value="' + form[2] + '">';
     document.getElementById('InputStudentName').innerHTML = '<label for="InputStudentName">学生姓名</label><input type="text" class="form-control"readonly="readonly" value="' + form[3] + '">';
     document.getElementById('InputOldScore').innerHTML = '<label for="InputOldScore">原成绩</label><input type="text" class="form-control"readonly="readonly" value="' + form[4] + '">';
+    d3.select('#requestForm').attr('action','B_score_modification/'+form[0]+'/'+form[2]);
         
 }
 

@@ -87,7 +87,7 @@ function updateList(data){
         .data(data)
         .enter().append("li")
         .attr("role","presentation")
-        .html(function(d){return '<a href="#" onclick="selectCourse(\'' + d.courseID +'\')">' + d.courseName + "</a>"});
+        .html(function(d){return '<a href="#" onclick="selectCourse(\'' + d.classID +'\')">' + d.courseName + "</a>"});
         // .html(function(d){return '<a href="#">' + d.courseName + "</a>"});
     // var firstCourse = d3.select("#courseList").select("li")
     // if(firstCourse.size() >= 1){
@@ -95,12 +95,12 @@ function updateList(data){
     // }
 }
 
-function selectCourse(courseID){
-    // console.log(courseID);
+function selectCourse(classID){
+    // console.log(classID);
     var course;
     for (var i = courseInfo.length - 1; i >= 0; i--) {
         course = courseInfo[i];
-        if(course.courseID == courseID)
+        if(course.classID == classID)
             break;
     }
     if(i<0){
@@ -108,16 +108,16 @@ function selectCourse(courseID){
         return;
     }
     theCourseInfo = course;
-    d3.select("#downloadButton").attr("href","/SM/B_download_xlsx/" + course.courseID);
-    d3.select("#uploadButton").attr("action","/SM/B_upload_xlsx/" + course.courseID);
-    d3.select("#commitButton").attr("href","/SM/B_finalCommit/"+course.courseID);
+    d3.select("#downloadButton").attr("href","/SM/B_download_xlsx/" + course.classID);
+    d3.select("#uploadButton").attr("action","/SM/B_upload_xlsx/" + course.classID);
+    d3.select("#commitButton").attr("href","/SM/B_finalCommit/"+course.classID);
     updateInfoTable(course);
-    updateStudentTable(course.courseID);
+    updateStudentTable(course.classID);
 }
 
-function updateStudentTable(courseID){
+function updateStudentTable(classID){
     // TODO
-    d3.json("/SM/B_temp_table_query/"+courseID,function(data){
+    d3.json("/SM/B_temp_table_query/"+classID,function(data){
         // console.log(data);
         d3.select("#studentTable").selectAll("tr").remove();
         d3.select("#studentTable").selectAll("tr")
@@ -137,7 +137,7 @@ function updateStudentTable(courseID){
 function updateInfoTable(course){
     d3.select("#infoTable").selectAll("td").remove();
     d3.select("#infoTable").selectAll("td")
-        .data([course.courseID, course.courseName, course.credits])
+        .data([course.classID, course.courseName, course.credits])
         .enter().append("td")
         .text(function(d){return d});
 }

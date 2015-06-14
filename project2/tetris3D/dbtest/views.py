@@ -2,6 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Context, loader
+from django import forms
 from .models import ScoreTable, TempTable, MessageTable, \
     Course_info, Class_info, class_table, \
     Student_user, Faculty_user
@@ -201,7 +202,8 @@ def b_temp_table_query(request, c_id):
     :param c_id: class_id from browser
     :return: json file
     """
-    return HttpResponse(json.dumps(db_temp_table_query(c_id)), content_type="application/json")
+    return HttpResponse(json.dumps(db_temp_table_query(c_id)),
+                        content_type="application/json")
 
 
 def temp_table_update(c_id, score_list):
@@ -211,6 +213,10 @@ def temp_table_update(c_id, score_list):
     :param score_list: in form of {'studentID': '0000000001', 'score': 100}
     :return:
     """
+    print("DEBUG BEGIN")
+    print(c_id)
+    print(score_list)
+    print("DEBUG END")
     for pair in score_list:
         print(pair['score'])
         try:  # upload after init upload, modify the record
@@ -218,14 +224,24 @@ def temp_table_update(c_id, score_list):
             tmp_rec.score = pair['score']
             tmp_rec.save()
         except:  # The first time to upload the records, create tuples
+            print(c_id)
+            print(type(c_id))
             s_id_instance = Student_user.objects.filter(id=pair['studentID']).first()
             c_id_instance = Class_info.objects.filter(class_id=c_id).first()
-            if s_id_instance is not None and c_id_instance is not None:
+            if s_id_instance is None:
+                return "上传失败。没有编号为" + pair['studentID'] + "的学生。"
+            elif c_id_instance is None:
+                return "上传失败。没有编号为" + c_id + "的课。"
+            else:
                 TempTable.objects.create(student_id=s_id_instance,
                                          class_id=c_id_instance,
                                          score=pair['score'])
-            else:
-                return HttpResponse(u'非法班级号或学号')
+                # else:
+                # print("s_id_instance None or c_id_instance None")
+                # print(s_id_instance)
+                # print(c_id_instance)
+                # return HttpResponse(u'非法班级号或学号')
+    return 0
 
 
 def b_teacher_query(request):
@@ -321,8 +337,24 @@ def db_score_query(c_id, is_temp):
     # return HttpResponse(json.dumps(ret_list), content_type="application/json")
 
 
-def B_score_modification(request):
+class ModifyForm(forms.Form):
+    classID = forms.DateField()
+    studentID = forms.DateField()
+    newScore = forms.DateField()
+    modifyReason = forms.DateField()
+
+
+def B_score_modification(request, c_id, s_id):
     print("B_score_modification")
+    score = request.POST['newScore']
+    reason = request.POST['modifyReason']
+    print([c_id, s_id, score, reason])
+    # print(request.POST)
+    # mf = ModifyForm(request.POST)
+    # print(mf.is_valid())
+    # print(mf)
+    b_score_modification(c_id, s_id, score, reason)
+    return HttpResponse("上传成功")
 
 
 def b_score_modification(c_id, s_id, score, reason):
@@ -481,7 +513,7 @@ class XlsxForm(forms.Form):
 import os
 
 
-def upload_xlsx(request, c_id='0000000001'):
+def upload_xlsx(request, c_id):
     upload_dir = './upload/'
 
     if request.method == "POST":
@@ -502,8 +534,15 @@ def upload_xlsx(request, c_id='0000000001'):
             if not os.path.exists(upload_dir):
                 os.mkdir(upload_dir)
 
-            update_score(upload_dir + '{}'.format(orig_filename))
-            os.remove(upload_dir + '{}'.format(orig_filename))
+            hr = update_score(upload_dir + '{}'.format(orig_filename), c_id)
+            try:
+                os.remove(upload_dir + '{}'.format(orig_filename))
+            except:
+                print("Cannot remove file" + upload_dir + '{}'.format(orig_filename))
+            if hr:
+                return HttpResponse(hr)
+            # else:
+            # return HttpResponse('upload ok!')
             return HttpResponse('upload ok!')
     else:
         uf = XlsxForm()

@@ -222,20 +222,24 @@ def temp_table_update(c_id, score_list):
             tmp_rec.score = pair['score']
             tmp_rec.save()
         except:  # The first time to upload the records, create tuples
-            print(pair['studentID'])
+            print(c_id)
+            print(type(c_id))
             s_id_instance = Student_user.objects.filter(id=pair['studentID']).first()
             c_id_instance = Class_info.objects.filter(class_id=c_id).first()
-            if s_id_instance is not None and c_id_instance is not None:
+            if s_id_instance is None:
+                return "上传失败。没有编号为"+pair['studentID']+"的学生。";
+            elif c_id_instance is None:
+                return "上传失败。没有编号为"+c_id+"的课。";
+            else:
                 TempTable.objects.create(student_id=s_id_instance,
                                          class_id=c_id_instance,
                                          score=pair['score'])
-            else:
-                print("s_id_instance None or c_id_instance None")
-                print(s_id_instance)
-                print(c_id_instance)
+            # else:
+            #     print("s_id_instance None or c_id_instance None")
+            #     print(s_id_instance)
+            #     print(c_id_instance)
                 # return HttpResponse(u'非法班级号或学号')
-
-
+    return 0
 
 def b_teacher_query(request):
     """
@@ -495,11 +499,15 @@ def upload_xlsx(request, c_id):
             if not os.path.exists(upload_dir):
                 os.mkdir(upload_dir)
 
-            update_score(upload_dir + '{}'.format(orig_filename), c_id)
+            hr = update_score(upload_dir + '{}'.format(orig_filename), c_id)
             try:
                 os.remove(upload_dir + '{}'.format(orig_filename))
             except:
                 print("Cannot remove file" + upload_dir + '{}'.format(orig_filename))
+            if hr:
+                return HttpResponse(hr)
+            # else:
+            #     return HttpResponse('upload ok!')
             return HttpResponse('upload ok!')
     else:
         uf = XlsxForm()

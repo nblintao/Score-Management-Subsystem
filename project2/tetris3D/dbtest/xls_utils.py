@@ -121,11 +121,15 @@ def get_demo_xlsx(course_id):
 def update_score(xlsx_filename, c_id):
     xlsx_info = parse_xlsx(xlsx_filename)
     # views.temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+    print('cid')
+    print(c_id)
+    print("xlsx_info.class_id")
+    print(xlsx_info.class_id)
     if c_id == xlsx_info.class_id:
-        temp_table_update(xlsx_info.class_id, xlsx_info.scores)
+        return temp_table_update(xlsx_info.class_id, xlsx_info.scores)
     else:
-        print("The class id mentioned in the uploaded file doesn't match your\
- selected class. Update failed.")
+        return "The class id mentioned in the uploaded file doesn't match your\
+ selected class. Update failed."
 
 
 # get_demo_xlsx()

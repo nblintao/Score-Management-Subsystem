@@ -17,6 +17,5 @@ urlpatterns = [
     url(r'^B_sanction_result/(?P<msg_id>\d+)/(?P<status>[01])', views.b_sanction_result),
     url(r'^B_upload_xlsx/(?P<c_id>\d+)', views.upload_xlsx),
     url(r'^B_download_xlsx/(?P<c_id>\d+)', views.download_xlsx),
-    # url(r'^B_finalCommit/(?P<c_id>\d+)', views.finalCommit),
-    # url(r'^B_download/(?P<course_id>\d+)', views.B_download),
+    url(r'^B_finalCommit/(?P<c_id>\d+)', views.b_final_commit),
 ]

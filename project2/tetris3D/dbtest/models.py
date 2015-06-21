@@ -133,3 +133,13 @@ class ScoreTable(models.Model):
 
 class User(models.Model):
     xlsx_file = models.FileField(upload_to='./upload/')
+
+#This class should be get from group of "Choose course"
+class Scheme_info(models.Model):
+    id = models.CharField(max_length=50,primary_key=True)
+    student_id = models.ForeignKey(Student_user)
+    course_id = models.ForeignKey(Course_info,related_name='scheme_course')
+    class Meta:
+        ordering = ["student_id"]
+    def __str__(self):
+        return (self.id)

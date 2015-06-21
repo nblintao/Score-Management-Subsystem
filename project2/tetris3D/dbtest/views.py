@@ -5,7 +5,7 @@ from django.template import Context, loader
 from django import forms
 from .models import ScoreTable, TempTable, MessageTable, \
     Course_info, Class_info, class_table, \
-    Student_user, Faculty_user
+    Student_user, Faculty_user, Scheme_info
 import json
 # User Authentication
 from .forms import NameForm
@@ -496,6 +496,32 @@ def b_final_commit(request, c_id):
                                       score=rec.score)
         TempTable.objects.filter(class_id=cla.class_id).delete()
         return HttpResponse(u'提交成功！')
+
+def db_scheme_info_query(s_id):
+    """
+    Query the schemeTable of records for student
+    :param student_id: as the title
+    :return: list in form of {studentID,studentName,courseId,courseName,credits,status}
+    """
+    ret_list = []
+    course_list=Scheme_info.objects.filter(student_id=s_id);
+    print course_list
+    for cou in course_list:
+        tmp_node = {
+            'studentID': cou.student_id.id,
+            'studentName': cou.student_id.name,
+            'courseId': cou.course_id.course_id,
+            'courseName': cou.course_id.name,
+            'credits': cou.course_id.credits
+        }
+        ret_list.append(tmp_node)
+    print (ret_list)
+    return ret_list
+
+def b_query_scheme_info(request):
+    student_id=request.user.username
+    return HttpResponse(json.dumps(db_scheme_info_query(student_id)),
+                        content_type="application/json")
 
 
 from django.shortcuts import render, render_to_response

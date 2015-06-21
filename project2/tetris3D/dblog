@@ -1,0 +1,199 @@
+﻿#####
+# 	This is the database log when creating the database and tables
+#
+# 	Add comments here if any changes took place relevent to the database
+#####
+
+
+
+
+from dbtest.models import Student_user
+from dbtest.models import Faculty_user
+from dbtest.models import Course_info
+from dbtest.models import Class_info
+from dbtest.models import ScoreTable
+from dbtest.models import class_table
+from dbtest.models import TempTable
+from dbtest.models import Scheme_info
+from dbtest import views
+from dbtest import xls_utils
+
+
+### Add Student_user
+sty = Student_user.objects.create(id='0000000001', contact='123', name='zhazha', gender=True, college='csd', major='cse', grade='3', gpa=5.0, credits=199.9)
+
+stu = Student_user.objects.create(id='0000000002', contact='333', name='hahaha', gender=True, college='csd', major='ee', grade='4', gpa=1.0, credits=0.9)
+
+stu = Student_user.objects.create(id='0000000003', contact='222', name='lalala', gender=True, college='csd', major='cse', grade='1', gpa=1.0, credits=50.9)
+
+stu = Student_user.objects.create(id='0000000004', contact='111', name='lololo', gender=True, college='eec', major='ee', grade='2', gpa=5.0, credits=10.9)
+
+
+### Add Faculty_user
+fac = Faculty_user.objects.create(id='000001', contact='123', name='chairLin', gender=True, college='csd', major='cse', degree='phd', title='prof')
+
+fac = Faculty_user.objects.create(id='000002', contact='321', name='GrandQi', gender=False, college='csd', major='cse', degree='phd', title='prof')
+
+fac = Faculty_user.objects.create(id='000003', contact='haha', name='GrandZhu', gender=True, college='csd', major='cse', degree='phd', title='prof')
+
+### Add Course_info
+cour = Course_info.objects.create(course_id='00000001', name='firstclass', credits=1.0, chief_faculty=fac, semester='1', textbook='ffff', college='csd')
+
+cour = Course_info.objects.create(course_id='00000002', name='secondclass', credits=2.0, chief_faculty=fac, semester='3', textbook='hhhh', college='eed')
+
+cour = Course_info.objects.create(course_id='00000003', name='thirdclass', credits=10.0, chief_faculty=fac, semester='4', textbook='yourhandbook', college='csd')
+
+cour = Course_info.objects.create(course_id='00000004', name='thirdclass', credits=10.0, chief_faculty=fac, semester='4', textbook='yourhandbook', college='csd')
+
+
+### Add Class_info
+cour = Course_info.objects.get(course_id='00000001')
+cla = Class_info.objects.create(class_id='0000000001', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cour = Course_info.objects.get(course_id='00000002')
+cla = Class_info.objects.create(class_id='0000000002', course_id=cour, teacher='chairLin', time='1', room='105', examdate='160405', examtime='120', examroom='103', capacity='50')
+
+cour = Course_info.objects.get(course_id='00000003')
+cla = Class_info.objects.create(class_id='0000000003', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cour = Course_info.objects.get(course_id='00000004')
+cla = Class_info.objects.create(class_id='0000000004', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cour = Course_info.objects.get(course_id='00000004')
+cla = Class_info.objects.create(class_id='0000000005', course_id=cour, teacher='GrandQi', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+cla = Class_info.objects.create(class_id='0000000006', course_id=cour, teacher='GrandQi', time='5', room='205', examdate='150405', examtime='120', examroom='103', capacity='50')
+
+
+
+### Update class_table
+#### class1			已出分
+cla = Class_info.objects.get(class_id='0000000001')
+stu = Student_user.objects.get(id='0000000001')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000002')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000003')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000004')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+
+#### class2  		上传未确认
+cla = Class_info.objects.get(class_id='0000000002')
+
+stu = Student_user.objects.get(id='0000000001')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000002')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000003')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000004')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+#### class3			已出分
+cla = Class_info.objects.get(class_id='0000000003')
+
+stu = Student_user.objects.get(id='0000000001')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000002')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+#### class4			未上传
+cla = Class_info.objects.get(class_id='0000000004')
+
+stu = Student_user.objects.get(id='0000000003')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000004')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+#### class5			已出分		
+cla = Class_info.objects.get(class_id='0000000005')
+stu = Student_user.objects.get(id='0000000003')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000004')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+#### class6			未上传
+cla = Class_info.objects.get(class_id='0000000006')
+stu = Student_user.objects.get(id='0000000001')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+stu = Student_user.objects.get(id='0000000002')
+class_tuple = class_table.objects.create(student_id=stu, class_id=cla)
+
+
+### Update ScoreTable 
+cla = Class_info.objects.get(class_id='0000000001')
+stu = Student_user.objects.get(id='0000000001')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=99.5)
+
+stu = Student_user.objects.get(id='0000000002')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=90.5)
+
+stu = Student_user.objects.get(id='0000000003')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=85.5)
+
+stu = Student_user.objects.get(id='0000000004')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=60.5)
+
+
+cla = Class_info.objects.get(class_id='0000000003')
+stu = Student_user.objects.get(id='0000000001')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=88.5)
+
+stu = Student_user.objects.get(id='0000000002')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=94.5)
+
+cla = Class_info.objects.get(class_id='0000000005')
+stu = Student_user.objects.get(id='0000000003')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=60.5)
+
+stu = Student_user.objects.get(id='0000000004')
+sco = ScoreTable.objects.create(class_id=cla, student_id=stu, score=77.5)
+
+
+### Update TempTable with class 2
+
+cla = Class_info.objects.get(class_id='0000000002')
+stu = Student_user.objects.get(id='0000000001')
+sco = TempTable.objects.create(class_id=cla, student_id=stu, score=88.5)
+
+stu = Student_user.objects.get(id='0000000002')
+sco = TempTable.objects.create(class_id=cla, student_id=stu, score=77.5)
+
+stu = Student_user.objects.get(id='0000000003')
+sco = TempTable.objects.create(class_id=cla, student_id=stu, score=66.5)
+
+stu = Student_user.objects.get(id='0000000004')
+sco = TempTable.objects.create(class_id=cla, student_id=stu, score=99.5)
+
+### Add Scheme
+cour = Course_info.objects.get(course_id='00000001')
+stu = Student_user.objects.get(id='0000000001')
+result = Scheme_info.objects.create(id='1',student_id=stu,course_id=cour)
+cour = Course_info.objects.get(course_id='00000002')
+stu = Student_user.objects.get(id='0000000001')
+result = Scheme_info.objects.create(id='2',student_id=stu,course_id=cour)
+
+
+#### Test of modification after commit 
+
+l = views.b_score_modification('0000000001', '0000000001', 88.5, '123')
+l = views.b_score_modification('0000000001', '0000000002', 0, u'考试作弊了')
+l = views.db_query_modify_info('000002')
+#　l = views.b_sanction_result(1, '1')
+l = views.ScoreTable.objects.filter(class_id='0000000001', student_id='0000000001').first()
+l = views.db_query_modify_info('000002')
+l = views.b_score_modification('0000000005', '0000000003', 60.5, u'原因是什么我也不知道') 
+l = views.b_score_modification('0000000005', '0000000004', 100, u'成绩改错了') 
+l = views.db_scheme_info_query('0000000001')

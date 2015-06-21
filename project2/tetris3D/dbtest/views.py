@@ -137,7 +137,7 @@ def b_student_query(request):
                     'credit': tmp_class.course_id.credits,
                     'score': tmp_score,
                     'gradePoint': tmp_gpa
-        }
+                    }
         scores.append(tmp_node)
     print(scores)
     return HttpResponse(json.dumps(scores), content_type="application/json")
@@ -289,7 +289,7 @@ def faculty_class_query(f_id, is_temp):
                       'courseID': cla.course_id.course_id,
                       'courseName': cla.course_id.name,
                       'credits': cla.course_id.credits
-        }
+                      }
         info_list.append(tmp_node)
     return info_list
 
@@ -330,7 +330,7 @@ def db_score_query(c_id, is_temp):
                       'studentName': stu.student_id.name,
                       'score': tmp_score,
                       "gradePoint": tmp_gpa
-        }
+                      }
         ret_list.append(tmp_node)
     print(ret_list)
     return ret_list
@@ -411,7 +411,7 @@ def db_query_modify_info(faculty_id):
                        'new_score': rec.new_score,
                        'reason': rec.reason,
                        'status': tmp_status
-        }
+                       }
         modify_node.append(temp_node)
     # print(modify_node)
     ret.append(modify_node)
@@ -558,8 +558,10 @@ def upload_xlsx(request, c_id):
     return render_to_response('score_commit.html', {'uf': uf})
     # return render(request, 'score_commit.html')
 
+
 import random
 import string
+
 
 def download_xlsx(request, c_id):
     """
@@ -577,6 +579,39 @@ def download_xlsx(request, c_id):
     response['Content-Type'] = 'application/octet_stream'
 
     salt = ''.join(random.sample(string.ascii_letters + string.digits, 8))
-    response['Content-Disposition'] = 'attachment; filename="sample_'+ salt +'.xlsx"'
+    response['Content-Disposition'] = 'attachment; filename="sample_' + salt + '.xlsx"'
 
-    return response 
+    return response
+
+
+editing_class = []
+
+
+def class_info_online_edit(course_id):
+    """
+    get class score info for online editing
+    :param course_id: course id
+    :return: a list of dict with the following keys
+    ('studentID', 'studentName', 'score') None for 'not able to edit'
+    """
+
+    # check if the queried course is already being edited.
+    if editing_class.index(course_id) is not None:
+        return None
+
+    return class_info_query(course_id)
+
+
+def class_info_online_save(course_id, scores):
+    """
+    save online score info
+    :param course_id: the editing class id
+    :param scores: scores after modification , is a dictionary with key 'studentID', 'score'
+    :return: nothing
+    """
+
+    # remove the class from editing_class list
+    if editing_class.index(course_id) is not None:
+        editing_class.remove(course_id)
+
+    temp_table_update(course_id, scores)

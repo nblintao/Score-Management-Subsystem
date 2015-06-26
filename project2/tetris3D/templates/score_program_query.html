@@ -52,20 +52,7 @@
                     </tr>
                 </thead>
                 <tbody id="scoreTable">
-<!--                     <tr>
-                        <td>(2012-2013-2)-04810020-0096419-1</td>
-                        <td>户外拓展</td>
-                        <td>87</td>
-                        <td>1.0</td>
-                        <td>4.20</td>
-                    </tr>
-                    <tr>
-                        <td>(2012-2013-2)-04810020-0096419-1</td>
-                        <td>户外拓展</td>
-                        <td>87</td>
-                        <td>1.0</td>
-                        <td>4.20</td>
-                    </tr> -->
+
                 </tbody>
             </table>
         </div>
@@ -73,16 +60,7 @@
     </div>
 </div>
 <script type="text/javascript">
-//TODO
-    // var Param;
-    // var type='{{ type }}';
-    // if (type=='student'){
-    //     Param='/SM/B_student_query/'+'{{ id }}';
-    // }
-    // else if (type=='teacher'){
-    //     Param='/SM/B_teacher_query/'+'{{ id }}';
-    // }
-    // d3.json(Param,function(data){
+
     d3.json('/SM/B_student_query',function(data){   // retrieve all the score information of logined student
         var values = data.map(function(d){return d.score;});
         updateTable(data);  // call funttion to update the student scores
@@ -100,16 +78,6 @@ function generateIcon(status){    // generate the icons for each state of modifi
     }
 }
 
-function dispNum(d){
-    var str;
-    try{
-        str = d.toFixed(2);
-    }catch(err){
-        console.log(err);
-        str = '无统计信息';
-    }
-    return str;
-}
 function updateTable(data) { // update student's transcript 
     d3.select("#scoreTable").selectAll("tr").remove();
     d3.select("#scoreTable").selectAll("tr")

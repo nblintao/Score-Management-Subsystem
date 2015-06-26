@@ -137,16 +137,6 @@ path {
         console.log(data);
     })
 
-function generateIcon(status){    // generate the icons for each state of modification request
-    switch(status){
-        case 'admit':
-            return '<span class="label label-success">已修</span>';
-        case 'reject':
-            return '<span class="label label-danger">未修</span>';
-        case 'pending':
-            return '<span class="label label-info">正在修读</span>';
-    }
-}
 
 function updateInfo(data,values){   //update the student scores
     var info = [];

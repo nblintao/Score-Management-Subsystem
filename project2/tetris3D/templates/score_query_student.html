@@ -28,15 +28,43 @@
   shape-rendering: crispEdges;
 }
 
+
+path {
+    stroke: DodgerBlue;
+    stroke-width: 1;
+    /*fill: none;*/
+}
+.axis {
+    font-size: 11px;
+    fill: gray;
+}
+
+.x.axis line {
+  stroke: lightgrey;
+}
+
+.x.axis .minor {
+  stroke-opacity: .5;
+}
+
+.x.axis path {
+  fill: none;
+  stroke: #fafafa;
+}
+
+.y.axis line, .y.axis path {
+  fill: none;
+  stroke: lightgrey;
+}
+
 </style>
 
 </head>
 <body>
 <div class="container-fluid">
     <ul class="nav nav-tabs">
-      <li role="presentation" class="active"><a href="/SM/query">成绩查询</a></li>
-      <li role="presentation"><a href="/SM/commit">成绩登记</a></li>
-      <li role="presentation"><a href="/SM/modification">成绩修改</a></li>
+      <li role="presentation"><a href="/SM/query">成绩查询</a></li>
+      <li role="presentation"><a href="/SM/program_query">培养方案</a></li>
       <li role="presentation"><a href="/SM/logout">退出</a></li>
     </ul>
     <div class="row">
@@ -56,7 +84,7 @@
             <table class="table table-hover" >
                 <thead>
                     <tr>
-                        <th>选课课号</th>
+                        <th>课程代码</th>
                         <th>课程名称</th>
                         <th>成绩</th>
                         <th>学分</th>
@@ -81,7 +109,11 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-md-5" id="histo"></div>
+        <div class="col-md-5">
+            <div id="histo"></div>
+            <div id="line"></div>
+        </div>
+
     </div>
 </div>
 <script type="text/javascript">
@@ -97,11 +129,24 @@
     // d3.json(Param,function(data){
     d3.json('/SM/B_student_query',function(data){   // retrieve all the score information of logined student
         var values = data.map(function(d){return d.score;});
+        var GPA = data.map(function(d){return d.gradePoint;});
         updateTable(data);  // call funttion to update the student scores
         drawHisto(values);  // call function to update the histogram
+        drawLine(GPA);  // call function to update the histogram
         updateInfo(data,values);    // call function to update its statistical information
+        console.log(data);
     })
 
+function generateIcon(status){    // generate the icons for each state of modification request
+    switch(status){
+        case 'admit':
+            return '<span class="label label-success">已修</span>';
+        case 'reject':
+            return '<span class="label label-danger">未修</span>';
+        case 'pending':
+            return '<span class="label label-info">正在修读</span>';
+    }
+}
 
 function updateInfo(data,values){   //update the student scores
     var info = [];
@@ -240,48 +285,62 @@ svg.append("g") // set axis
     .attr("transform", "translate(0," + height + ")")
     .call(xAxis);
 
-// // Generate a histogram using twenty uniformly-spaced bins.
-// var data = d3.layout.histogram()
-//     .bins(x.ticks(20))
-//     (values);
+}
 
-// var y = d3.scale.linear()
-//     .domain([0, d3.max(data, function(d) { return d.y; })])
-//     .range([height, 0]);
 
-// var xAxis = d3.svg.axis()
-//     .scale(x)
-//     .orient("bottom");
+function drawLine(values) {
 
-// var svg = d3.select("#histo").append("svg")
-//     .attr("width", width + margin.left + margin.right)
-//     .attr("height", height + margin.top + margin.bottom)
-//   .append("g")
-//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var formatCount = d3.format(",.0f");
 
-// var bar = svg.selectAll(".bar")
-//     .data(data)
-//   .enter().append("g")
-//     .attr("class", "bar")
-//     .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+var margin = {top: 10, right: 30, bottom: 30, left: 30},
+    width = 500 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-// bar.append("rect")
-//     .attr("x", 1)
-//     .attr("width", x(data[0].dx) - 1)
-//     .attr("height", function(d) { return height - y(d.y); });
+        
+console.log(values)
 
-// bar.append("text")
-//     .attr("dy", ".75em")
-//     .attr("y", 6)
-//     .attr("x", x(data[0].dx) / 2)
-//     .attr("text-anchor", "middle")
-//     .text(function(d) { return formatCount(d.y); });
+var Ymax = d3.max(values),
+    Ymin = d3.min(values);
 
-// svg.append("g")
-//     .attr("class", "x axis")
-//     .attr("transform", "translate(0," + height + ")")
-//     .call(xAxis);
-// 
+var Yrange = Ymax - Ymin;
+
+var xScale = d3.scale.linear().domain([1, values.length]).range([0, width]);
+var yScale = d3.scale.linear().domain([Ymin-Yrange*0.3, Ymax+Yrange*0.3]).range([height, 0]);
+
+// add line function here
+var line = d3.svg.line()
+    .x(function(d,i) { 
+        return xScale(i+1); //利用尺度運算資料索引，傳回x的位置
+    })
+    .y(function(d) { 
+        return yScale(d); //利用尺度運算資料的值，傳回y的位置
+    });
+
+//增加一個SVG元素
+var svg = d3.select('#line').append('svg')
+    .attr('width', width + margin.left + margin.right) //將左右補滿
+    .attr('height', height + margin.top + margin.bottom) //上下補滿
+    .append('g') //增加一個群組g
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+var xAxis = d3.svg.axis().scale(xScale).ticks(values.length - 1).orient('bottom');
+
+// x axis
+svg.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate(0,' + height + ')')
+    .call(xAxis);
+
+// y axis
+var yAxisLeft = d3.svg.axis().scale(yScale).ticks(10).orient('left');
+// SVG加入y軸線
+svg.append('g')
+    .attr('class', 'y axis')
+    .attr('transform', 'translate(0,0)')
+    .call(yAxisLeft);
+            
+svg.append('path').attr('d', line(values)); //將資料套用d3.svg.line()
+
 }
 </script>
 </body>

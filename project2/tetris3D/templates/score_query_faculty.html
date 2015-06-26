@@ -82,10 +82,10 @@
             	<div class="panel-body">
 		            <table class="table table-hover">
 		                <tr>
-		                    <th>学号</th>
+		                    <th onclick="setOption('studentID')" style="cursor:pointer">学号</th>
 		                    <th>姓名</th>
-		                    <th>成绩</th>
-		                    <th>绩点</th>
+		                    <th onclick="setOption('score')" style="cursor:pointer">成绩</th>
+		                    <th onclick="setOption('score')" style="cursor:pointer">绩点</th>
 		                </tr>
 		                <tbody id = "studentScore"></tbody>
 		<!--                 <tr>
@@ -123,6 +123,7 @@
     });
 
 var coursesInfo;
+var dispClass;
 var studentScore;
 
 function updateInfoTable(data){
@@ -137,16 +138,39 @@ function updateInfoTable(data){
             str += "<td>" + d.courseName + "</td>";
             str += "<td>" + d.credits + "</td>";
             str += "<td>" + d.classTime + "</td>";
-            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\')">' + "查看此课" + "</button></td>"; // 单击查看此课，对成绩表进行更新
+            str += "<td>" + '<button class="btn btn-default btn-sm" onclick="updateClassScore(\'' + d.classID +'\',\'studentID\')">' + "查看此课" + "</button></td>"; // 单击查看此课，对成绩表进行更新
             return str;
         });
 }
 
-function updateClassScore(classID){
-    console.log(classID);
+var sortBy = function (filed, rev, primer) {
+    rev = (rev) ? -1 : 1;
+    return function (a, b) {
+        a = a[filed];
+        b = b[filed];
+        if (typeof (primer) != 'undefined') {
+            a = primer(a);
+            b = primer(b);
+        }
+        if (a < b) { return rev * -1; }
+        if (a > b) { return rev * 1; }
+        return 1;
+    }
+};
+
+function setOption(op){
+    updateClassScore(dispClass, op);
+}
+
+function updateClassScore(classID, option){
+    //console.log(classID);
     d3.json("/SM/B_final_class_score_query/"+classID,function(data){   // 根据classID获取成绩表
-        // console.log(data);
+
         var values = data.map(function(d){return d.score;});
+        var isDes = (option == 'score');
+        data.sort(sortBy(option, isDes, parseInt));
+        //console.log(values);
+
         d3.select("#studentScore").selectAll("tr").remove();    // clear old infomation
         d3.select("#studentScore").selectAll("tr")
             .data(data)
@@ -159,6 +183,7 @@ function updateClassScore(classID){
             str += "<td>" + d.gradePoint + "</td>";
             return str;
         });
+        dispClass = classID;
         studentScore = data;
         updateStatInfo(data);   // call updateStatInfo to update the statistical information
         drawHisto(values);
@@ -186,6 +211,47 @@ function updateStatInfo(data){  // 生成成绩表对应的统计信息
         return str;
     });
 }
+
+function convert(sValue, dataType,sortDerection) {
+    switch (dataType) {
+    case "int":
+        if(sValue.length <= 0){
+            if(sortDerection == "asc") {
+                sValue = "1000";
+            } else {
+                sValue = "-1";
+            }
+        }
+        return parseInt(sValue, 10);
+    case "float":
+        return parseFloat(sValue);
+    case "date":
+        return new Date(Date.parse(sValue));
+    default:
+        return sValue.toString().toLowerCase();
+    }
+}
+
+function compareEle(iCol, dataType,sortDerection) {
+    return function(oTR1, oTR2) {
+        var vValue1 = convert(ieOrFireFox(oTR1.cells[iCol]), dataType,sortDerection);
+        var vValue2 = convert(ieOrFireFox(oTR2.cells[iCol]), dataType,sortDerection);
+        var returnResult = 0;
+        if (vValue1 < vValue2) {
+            returnResult = -1;
+        } else if (vValue1 > vValue2) {
+            returnResult = 1;
+        } else {
+            returnResult = 0;
+        }
+        if(sortDerection == "desc"){
+            return -returnResult;
+        } else {
+            return returnResult;
+        }
+    };
+}
+
 
 </script>
 

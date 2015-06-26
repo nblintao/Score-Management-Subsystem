@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^login', views.score_login),
     url(r'^logout', views.score_logout),
     url(r'^query', views.score_query),
+    url(r'^program_query', views.program_query),
     url(r'^commit', views.score_commit),
     url(r'^modification', views.score_modification),
     url(r'^B_student_query', views.b_student_query),

@@ -92,6 +92,8 @@ def score_query(request):
         return render(request, 'score_query_faculty.html')
         # return HttpResponse(t.render(id=name))
 
+def program_query(request):
+    return render(request, 'score_program_query.html')
 
 # you can use login_required to control access
 @login_required(login_url='/SM/login/')

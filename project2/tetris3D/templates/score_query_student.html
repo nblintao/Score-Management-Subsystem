@@ -92,21 +92,7 @@ path {
                     </tr>
                 </thead>
                 <tbody id="scoreTable">
-<!--                     <tr>
-                        <td>(2012-2013-2)-04810020-0096419-1</td>
-                        <td>户外拓展</td>
-                        <td>87</td>
-                        <td>1.0</td>
-                        <td>4.20</td>
-                    </tr>
-                    <tr>
-                        <td>(2012-2013-2)-04810020-0096419-1</td>
-                        <td>户外拓展</td>
-                        <td>87</td>
-                        <td>1.0</td>
-                        <td>4.20</td>
-                    </tr> -->
-                </tbody>
+          </tbody>
             </table>
         </div>
         <div class="col-md-5">
@@ -224,7 +210,7 @@ var formatCount = d3.format(",.0f");
 
 var margin = {top: 10, right: 30, bottom: 30, left: 30},
     width = 500 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 300 - margin.top - margin.bottom;
 
 // console.log(d3.extent(values));
 var x = d3.scale.linear()
@@ -284,7 +270,7 @@ var formatCount = d3.format(",.0f");
 
 var margin = {top: 10, right: 30, bottom: 30, left: 30},
     width = 500 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 300 - margin.top - margin.bottom;
 
         
 console.log(values)
@@ -322,7 +308,7 @@ svg.append('g')
     .call(xAxis);
 
 // y axis
-var yAxisLeft = d3.svg.axis().scale(yScale).ticks(10).orient('left');
+var yAxisLeft = d3.svg.axis().scale(yScale).ticks(5).orient('left');
 // SVG加入y軸線
 svg.append('g')
     .attr('class', 'y axis')

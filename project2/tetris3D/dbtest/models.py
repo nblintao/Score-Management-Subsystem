@@ -139,6 +139,7 @@ class Scheme_info(models.Model):
     id = models.CharField(max_length=50,primary_key=True)
     student_id = models.ForeignKey(Student_user)
     course_id = models.ForeignKey(Course_info,related_name='scheme_course')
+    state = models.IntegerField(default=0)
     class Meta:
         ordering = ["student_id"]
     def __str__(self):

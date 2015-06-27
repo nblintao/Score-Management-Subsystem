@@ -514,7 +514,10 @@ def db_scheme_info_query(s_id):
             'studentName': cou.student_id.name,
             'courseId': cou.course_id.course_id,
             'courseName': cou.course_id.name,
-            'credits': cou.course_id.credits
+            'courseSemester': cou.course_id.semester,
+            'courseCollege': cou.course_id.college,
+            'credits': cou.course_id.credits,
+            'state': cou.state
         }
         ret_list.append(tmp_node)
     print (ret_list)

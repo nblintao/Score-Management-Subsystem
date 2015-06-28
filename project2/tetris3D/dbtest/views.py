@@ -92,8 +92,10 @@ def score_query(request):
         return render(request, 'score_query_faculty.html')
         # return HttpResponse(t.render(id=name))
 
+
 def program_query(request):
     return render(request, 'score_program_query.html')
+
 
 # you can use login_required to control access
 @login_required(login_url='/SM/login/')
@@ -499,6 +501,7 @@ def b_final_commit(request, c_id):
         TempTable.objects.filter(class_id=cla.class_id).delete()
         return HttpResponse(u'提交成功！')
 
+
 def db_scheme_info_query(s_id):
     """
     Query the schemeTable of records for student
@@ -506,8 +509,8 @@ def db_scheme_info_query(s_id):
     :return: list in form of {studentID,studentName,courseId,courseName,credits,status}
     """
     ret_list = []
-    course_list=Scheme_info.objects.filter(student_id=s_id);
-    print course_list
+    course_list = Scheme_info.objects.filter(student_id=s_id)
+    print(course_list)
     for cou in course_list:
         tmp_node = {
             'studentID': cou.student_id.id,
@@ -520,11 +523,12 @@ def db_scheme_info_query(s_id):
             'state': cou.state
         }
         ret_list.append(tmp_node)
-    print (ret_list)
+    print(ret_list)
     return ret_list
 
+
 def b_query_scheme_info(request):
-    student_id=request.user.username
+    student_id = request.user.username
     return HttpResponse(json.dumps(db_scheme_info_query(student_id)),
                         content_type="application/json")
 
@@ -618,20 +622,36 @@ def download_xlsx(request, c_id):
 editing_class = []
 
 
-def class_info_online_edit(course_id):
+# def class_info_online_edit(course_id):
+#     """
+#     get class score info for online editing
+#     :param course_id: course id
+#     :return: a list of dict with the following keys
+#     ('studentID', 'studentName', 'score') None for 'not able to edit'
+#     """
+#
+#     # check if the queried course is already being edited.
+#     if editing_class.index(course_id) is not None:
+#         return None
+#
+#     return class_info_query(course_id)
+
+def class_info_online_edit(request, course_id):
     """
     get class score info for online editing
     :param course_id: course id
     :return: a list of dict with the following keys
-    ('studentID', 'studentName', 'score') None for 'not able to edit'
+    {studentID, studentName, score, gradePoint} None for 'not able to edit'
     """
 
     # check if the queried course is already being edited.
     if editing_class.index(course_id) is not None:
         return None
 
-    return class_info_query(course_id)
+    return db_temp_table_query(course_id)
 
+def b_online_save(s_id, c_id, new_score):
+    temp_table_update(c_id, {'studentID': s_id, 'score': new_score})
 
 def class_info_online_save(course_id, scores):
     """
@@ -646,3 +666,11 @@ def class_info_online_save(course_id, scores):
         editing_class.remove(course_id)
 
     temp_table_update(course_id, scores)
+
+def get_scheme_info(student_id):
+    """
+    :return: list in form of {studentID,studentName,courseId,courseName,credits,status}
+    :param student_id:
+    :return:
+    """
+    scheme = db_scheme_info_query(student_id)

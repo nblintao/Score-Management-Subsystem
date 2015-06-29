@@ -56,9 +56,9 @@ class Course_info(models.Model):
 
 class Class_info(models.Model):
     """
-    | class_id | course_id | teacher | time | room | examdate | examtime | examroom | capacity |
+    | class_id | course_id | teacher | time | room | examdate | examtime | examroom | capacity | semester
     |---|---|---|---|---|---|---|---|---|
-    | CHARACTER(10) | CHARACTER(8) | VARCHAR(20) | INTEGER | VARCHAR(20) | DATETIME(TEXT) | INTEGER | VARCHAR(20) | INTEGER |
+    | CHARACTER(10) | CHARACTER(8) | VARCHAR(20) | INTEGER | VARCHAR(20) | DATETIME(TEXT) | INTEGER | VARCHAR(20) | INTEGER | INTEGER |
     """
     class_id = models.CharField(max_length=10)
     course_id = models.ForeignKey(Course_info)
@@ -69,13 +69,14 @@ class Class_info(models.Model):
     examtime = models.IntegerField()
     examroom = models.CharField(max_length=20)
     capacity = models.IntegerField()
+    semester = models.IntegerField()
 
 
 class class_table(models.Model):
     """
-    | student_id | class_id |
+    | student_id | class_id | semester |
     |---|---|
-    | CHARACTER(10) | CHARACTER(10) |
+    | CHARACTER(10) | CHARACTER(10) | INTEGER
     """
     student_id = models.ForeignKey(Student_user)
     class_id = models.ForeignKey(Class_info)

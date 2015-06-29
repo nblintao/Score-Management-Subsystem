@@ -48,21 +48,21 @@ cour = Course_info.objects.create(course_id='00000004', name='thirdclass', credi
 
 ### Add Class_info
 cour = Course_info.objects.get(course_id='00000001')
-cla = Class_info.objects.create(class_id='0000000001', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+cla = Class_info.objects.create(class_id='0000000001', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50',semester='0')
 
 cour = Course_info.objects.get(course_id='00000002')
-cla = Class_info.objects.create(class_id='0000000002', course_id=cour, teacher='chairLin', time='1', room='105', examdate='160405', examtime='120', examroom='103', capacity='50')
+cla = Class_info.objects.create(class_id='0000000002', course_id=cour, teacher='chairLin', time='1', room='105', examdate='160405', examtime='120', examroom='103', capacity='50',semester='1')
 
 cour = Course_info.objects.get(course_id='00000003')
-cla = Class_info.objects.create(class_id='0000000003', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+cla = Class_info.objects.create(class_id='0000000003', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50',semester='2')
 
 cour = Course_info.objects.get(course_id='00000004')
-cla = Class_info.objects.create(class_id='0000000004', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+cla = Class_info.objects.create(class_id='0000000004', course_id=cour, teacher='chairLin', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50',semester='3')
 
 cour = Course_info.objects.get(course_id='00000004')
-cla = Class_info.objects.create(class_id='0000000005', course_id=cour, teacher='GrandQi', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50')
+cla = Class_info.objects.create(class_id='0000000005', course_id=cour, teacher='GrandQi', time='1', room='103', examdate='150405', examtime='120', examroom='103', capacity='50',semester='4')
 
-cla = Class_info.objects.create(class_id='0000000006', course_id=cour, teacher='GrandQi', time='5', room='205', examdate='150405', examtime='120', examroom='103', capacity='50')
+cla = Class_info.objects.create(class_id='0000000006', course_id=cour, teacher='GrandQi', time='5', room='205', examdate='150405', examtime='120', examroom='103', capacity='50',semester='4')
 
 
 

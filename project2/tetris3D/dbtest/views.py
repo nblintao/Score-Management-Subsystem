@@ -510,7 +510,7 @@ def db_scheme_info_query(s_id):
     """
     ret_list = []
     course_list = Scheme_info.objects.filter(student_id=s_id)
-    print(course_list)
+    # print(course_list)
     for cou in course_list:
         tmp_node = {
             'studentID': cou.student_id.id,
@@ -555,8 +555,6 @@ def upload_xlsx(request, c_id):
 
     # if really an upload
     if request.method == "POST":
-        print(request.POST)
-        print(request.FILES)
 
         # get the request's POST and FILES
         uf = XlsxForm(request.POST, request.FILES)
@@ -650,8 +648,11 @@ def class_info_online_edit(request, course_id):
 
     return db_temp_table_query(course_id)
 
-def b_online_save(s_id, c_id, new_score):
-    temp_table_update(c_id, {'studentID': s_id, 'score': new_score})
+def b_online_save(request, s_id, c_id):
+    new_score = request.POST['newScore']
+
+    temp_table_update(c_id, [{'studentID': s_id, 'score': new_score}])
+    return HttpResponse('修改成功')
 
 def class_info_online_save(course_id, scores):
     """

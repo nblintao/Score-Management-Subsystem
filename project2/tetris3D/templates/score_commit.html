@@ -25,11 +25,11 @@
                   <li role="presentation"><a href="#">英美文学</a></li> -->
             </ul>
         </div>
-        <div class="col-md-8">     
+        <div class="col-md-7">     
 
             <table class="table">
                 <tr>
-                    <th>选课课号</th>
+                    <th>课程代码</th>
                     <th>课程名称</th>
                     <th>学分</th>
                 </tr>
@@ -50,6 +50,7 @@
                     <th>姓名</th>
                     <th>成绩</th>
                     <th>绩点</th>
+                    <th>修改成绩</th>
                 </tr>
                 </thead>
                 <tbody id="studentTable">
@@ -66,8 +67,46 @@
                     <td>4.30</td>
                 </tr> -->
                 </tbody>                
-            </table>            
-        </div>
+            </table> 
+       </div>
+
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">成绩修改工具栏</div>
+                <div class="panel-body">
+                    <form id="editScoreForm" action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-group" id="EditCourseID">
+                            <label for="EditCourseID">教学班号</label>
+                            <input name="classID" id="id_classID" type="text" class="form-control" readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="EditCourseName" >
+                            <label for="EditCourseName">课程名称</label>
+                            <input type="text" class="form-control"readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="EditStudentID">
+                            <label for="EditStudentID">学生学号</label>
+                            <input name="studentID" id="id_studentID" type="text" class="form-control"readonly="readonly" value="">
+                        </div>                  
+                        <div class="form-group" id="EditStudentName">
+                            <label for="EditStudentName">学生姓名</label>
+                            <input type="text" class="form-control"readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="EditOldScore">
+                            <label for="EditOldScore">原成绩</label>
+                            <input type="text" class="form-control"readonly="readonly" value="">
+                        </div>
+                        <div class="form-group" id="EditNewScore">
+                            <label for="EditNewScore">新成绩</label>
+                            <input name="newScore" id="id_newScore" type="text" class="form-control">
+                        </div>
+
+                        <!--<a id="editButton" href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>提交修改</button></a>-->
+                        <button type="submit" class="btn btn-default" value="submit">提交修改</button>
+                    </form>
+                </div>
+            </div>
+
     </div>
 </div>
 <script type="text/javascript">
@@ -80,6 +119,7 @@
 
 var courseInfo;
 var theCourseInfo;
+var studentScore;
 
 function updateList(data){  // 左侧选择未commit的课程
     d3.select("#courseList").selectAll("li").remove();
@@ -120,7 +160,9 @@ function selectCourse(classID){ // update
 function updateStudentTable(classID){
     // TODO
     d3.json("/SM/B_temp_class_score_query/"+classID,function(data){
-        // console.log(data);
+        console.log(classID);
+        studentScore = data;
+
         d3.select("#studentTable").selectAll("tr").remove();
         d3.select("#studentTable").selectAll("tr")
             .data(data)
@@ -131,6 +173,7 @@ function updateStudentTable(classID){
             str += "<td>" + d.studentName + "</td>";    // 姓名
             str += "<td>" + d.score + "</td>";  // 分数
             str += "<td>" + d.gradePoint + "</td>"; // 绩点 
+            str += '<td><button class="btn btn-default btn-sm" onclick="createForm(\'' + classID + '\' , \'' + d.studentID + '\')">修改</button></td>';
             return str;
         });
     })
@@ -143,6 +186,52 @@ function updateInfoTable(course){   // 更新右上方课程信息
         .enter().append("td")
         .text(function(d){return d});
 }
+
+
+function createForm(classID, studentID){    // generate a new request form
+    
+    console.log(classID);
+    console.log(studentID);
+    
+    console.log(studentScore);
+    console.log(courseInfo);
+
+    var form = [];
+
+    var i;
+    var cTmp;
+    for (i = courseInfo.length - 1; i >= 0; i--) { // 若选择修改的记录与现在显示的一致，则break 
+        cTmp = courseInfo[i];
+        if(theCourseInfo.classID == classID)
+            break;
+    }
+    form[0] = theCourseInfo.classID;
+    form[1] = theCourseInfo.courseName;
+
+    var sTmp;
+    for (i = studentScore.length - 1; i >= 0; i--) { // 若选择修改的记录与现在显示的一致，则break 
+        sTmp = studentScore[i];
+        if(sTmp.studentID == studentID)
+            break;
+    }
+    form[2] = studentScore[i].studentID;
+    form[3] = studentScore[i].studentName;
+    form[4] = studentScore[i].score;
+
+    console.log([form]);
+
+    // modify the form in html
+    document.getElementById('EditCourseID').innerHTML = '<label for="EditCourseID">教学班号</label><input type="text" class="form-control" readonly="readonly" value="' + form[0] + '">';
+    document.getElementById('EditCourseName').innerHTML = '<label for="EditCourseName">课程名称</label><input type="text" class="form-control"readonly="readonly" value="' + form[1] + '">';
+    document.getElementById('EditStudentID').innerHTML = '<label for="EditStudentID">学生学号</label><input type="text" class="form-control"readonly="readonly" value="' + form[2] + '">';
+    document.getElementById('EditStudentName').innerHTML = '<label for="EditStudentName">学生姓名</label><input type="text" class="form-control"readonly="readonly" value="' + form[3] + '">';
+    document.getElementById('EditOldScore').innerHTML = '<label for="EditOldScore">原成绩</label><input type="text" class="form-control"readonly="readonly" value="' + form[4] + '">';
+
+    d3.select("#editScoreForm").attr('action',"/SM/B_online_save/" + form[2] + '/' + form[0]);
+        
+}
+
 </script>
+</div>
 </body>
 </html>

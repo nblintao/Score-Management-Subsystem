@@ -39,7 +39,7 @@
       <li role="presentation"><a href="/SM/logout">退出</a></li>
     </ul>
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-10">
 
             <table class="table table-hover" >
                 <thead>
@@ -61,10 +61,12 @@
 </div>
 <script type="text/javascript">
 
-    d3.json('/SM/B_student_query',function(data){   // retrieve all the score information of logined student
-        var values = data.map(function(d){return d.score;});
-        updateTable(data);  // call funttion to update the student scores
+    d3.json('/SM/B_scheme_info',function(data){   // retrieve all the score information of logined student
+//        var values = data.map(function(d){return d.score;});
+//        updateTable(data);  // call funttion to update the student scores
+        console.log(data);
        // updateInfo(data,values);    // call function to update its statistical information
+
     })
 
 function generateIcon(status){    // generate the icons for each state of modification request

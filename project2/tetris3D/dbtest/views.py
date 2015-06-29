@@ -50,7 +50,7 @@ def score_login(request):
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            Uname = request.POST['name'];
+            Uname = request.POST['name']
             user = authenticate(username=Uname, password=request.POST['password'])
             if user is not None:
                 if user.is_active:
@@ -505,7 +505,7 @@ def b_final_commit(request, c_id):
 def db_scheme_info_query(s_id):
     """
     Query the schemeTable of records for student
-    :param student_id: as the title
+    :param s_id: as the title
     :return: list in form of {studentID,studentName,courseId,courseName,credits,status}
     """
     ret_list = []

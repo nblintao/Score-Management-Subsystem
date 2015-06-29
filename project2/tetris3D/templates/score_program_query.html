@@ -61,10 +61,12 @@
 </div>
 <script type="text/javascript">
 
-    d3.json('/SM/B_student_query',function(data){   // retrieve all the score information of logined student
-        var values = data.map(function(d){return d.score;});
-        updateTable(data);  // call funttion to update the student scores
+    d3.json('/SM/B_scheme_info',function(data){   // retrieve all the score information of logined student
+//        var values = data.map(function(d){return d.score;});
+//        updateTable(data);  // call funttion to update the student scores
+        console.log(data);
        // updateInfo(data,values);    // call function to update its statistical information
+
     })
 
 function generateIcon(status){    // generate the icons for each state of modification request

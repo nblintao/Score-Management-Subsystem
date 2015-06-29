@@ -98,8 +98,10 @@
                         </div>
                         <div class="form-group" id="EditNewScore">
                             <label for="EditNewScore">新成绩</label>
-                            <input name="newScore" id="id_newScore" type="text" class="form-control" id="InputNewScore">
+                            <input name="newScore" id="id_newScore" type="text" class="form-control">
                         </div>
+
+                        <!--<a id="editButton" href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>提交修改</button></a>-->
                         <button type="submit" class="btn btn-default" value="submit">提交修改</button>
                     </form>
                 </div>
@@ -224,7 +226,8 @@ function createForm(classID, studentID){    // generate a new request form
     document.getElementById('EditStudentID').innerHTML = '<label for="EditStudentID">学生学号</label><input type="text" class="form-control"readonly="readonly" value="' + form[2] + '">';
     document.getElementById('EditStudentName').innerHTML = '<label for="EditStudentName">学生姓名</label><input type="text" class="form-control"readonly="readonly" value="' + form[3] + '">';
     document.getElementById('EditOldScore').innerHTML = '<label for="EditOldScore">原成绩</label><input type="text" class="form-control"readonly="readonly" value="' + form[4] + '">';
-    d3.select('#requestForm').attr('action','B_score_modification/'+form[0]+'/'+form[2]);
+
+    d3.select("#editScoreForm").attr('action',"/SM/B_online_save/" + form[2] + '/' + form[0]);
         
 }
 

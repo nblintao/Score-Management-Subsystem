@@ -139,6 +139,7 @@ def b_student_query(request):
         tmp_node = {'courseID': tmp_class.course_id.course_id,
                     'courseName': tmp_class.course_id.name,
                     'credit': tmp_class.course_id.credits,
+                    'semester': tmp_class.course_id.semester,
                     'score': tmp_score,
                     'gradePoint': tmp_gpa
                     }

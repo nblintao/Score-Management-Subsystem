@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^B_download_xlsx/(?P<c_id>\d+)', views.download_xlsx),
     url(r'^B_finalCommit/(?P<c_id>\d+)', views.b_final_commit),
     url(r'^B_online_save/(?P<s_id>\d+)/(?P<c_id>\d+)/(?P<new_score>\d+)', views.b_online_save),
+    url(r'^B_scheme_info/(?P<s_id>\d+)', views.get_scheme_info),
 ]

@@ -669,8 +669,9 @@ def class_info_online_save(course_id, scores):
 
 def get_scheme_info(student_id):
     """
-    :return: list in form of {studentID,studentName,courseId,courseName,credits,status}
+    :return: json of list in form of {studentID,studentName,courseId,courseName,credits,status}
     :param student_id:
     :return:
     """
     scheme = db_scheme_info_query(student_id)
+    return HttpResponse(json.dumps(scheme), content_type="application/json")

@@ -667,11 +667,11 @@ def class_info_online_save(course_id, scores):
 
     temp_table_update(course_id, scores)
 
-def get_scheme_info(student_id):
+def get_scheme_info(request):
     """
     :return: json of list in form of {studentID,studentName,courseId,courseName,credits,status}
-    :param student_id:
-    :return:
     """
+
+    student_id = request.user.username
     scheme = db_scheme_info_query(student_id)
     return HttpResponse(json.dumps(scheme), content_type="application/json")

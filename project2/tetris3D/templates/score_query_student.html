@@ -319,7 +319,7 @@ var svg = d3.select('#line').append('svg')
     .append('g') //增加一個群組g
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-var xAxis = d3.svg.axis().scale(xScale).ticks(xMax).orient('bottom');
+var xAxis = d3.svg.axis().scale(xScale).ticks(xMax-xMin+1).orient('bottom');
 
 // x axis
 svg.append('g')

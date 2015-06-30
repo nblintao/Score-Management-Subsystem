@@ -90,7 +90,7 @@ def score_query(request):
 		return render(request, 'score_query_student.html')
 	elif Type == 'teacher':
 		return render(request, 'score_query_faculty.html')
-		# return HttpResponse(t.render(id=name))
+	# return HttpResponse(t.render(id=name))
 
 
 def program_query(request):
@@ -241,11 +241,11 @@ def temp_table_update(c_id, score_list):
 				TempTable.objects.create(student_id=s_id_instance,
 										 class_id=c_id_instance,
 										 score=pair['score'])
-				# else:
-				# print("s_id_instance None or c_id_instance None")
-				# print(s_id_instance)
-				# print(c_id_instance)
-				# return HttpResponse(u'非法班级号或学号')
+			# else:
+			# print("s_id_instance None or c_id_instance None")
+			# print(s_id_instance)
+			# print(c_id_instance)
+			# return HttpResponse(u'非法班级号或学号')
 	return 0
 
 
@@ -339,7 +339,9 @@ def db_score_query(c_id, is_temp):
 		ret_list.append(tmp_node)
 	print(ret_list)
 	return ret_list
-	# return HttpResponse(json.dumps(ret_list), content_type="application/json")
+
+
+# return HttpResponse(json.dumps(ret_list), content_type="application/json")
 
 
 class ModifyForm(forms.Form):
@@ -379,13 +381,24 @@ def b_score_modification(c_id, s_id, score, reason):
 	print(s.class_id)
 	print(s.student_id)
 	old_score = s.score
-	chief_faculty = cla.course_id.chief_faculty  # generate a new message
-	update_message = MessageTable.objects.create(from_faculty_id=from_fac,
-												 to_faculty_id=chief_faculty,
-												 student_id=stu, class_id=cla,
-												 old_score=old_score, new_score=score,
-												 reason=reason, status=0)
-	print(update_message)
+
+	# chief_faculty = cla.course_id.chief_faculty  # generate a new message
+	# update_message = MessageTable.objects.create(from_faculty_id=from_fac,
+	# 											 to_faculty_id=chief_faculty,
+	# 											 student_id=stu, class_id=cla,
+	# 											 old_score=old_score, new_score=score,
+	# 											 reason=reason, status=0)
+
+	teacher_of_course = Class_info.objects.filter(course_id=cla.course_id)
+	for info in teacher_of_course:
+		to_fac = Faculty_user.objects.filter(name=info.teacher).first()
+		update_message = MessageTable.objects.create(from_faculty_id=from_fac,
+													 to_faculty_id=to_fac,
+													 student_id=stu, class_id=cla,
+													 old_score=old_score, new_score=score,
+													 reason=reason, status=0)
+
+		print(update_message)
 
 
 def db_query_modify_info(faculty_id):
@@ -486,6 +499,7 @@ def b_final_commit(request, c_id):
 	:param c_id: class_id
 	:return:
 	"""
+
 	fac = Faculty_user.objects.filter(id=request.user.username).first()
 	cla = Class_info.objects.filter(class_id=c_id).first()
 	if cla.teacher != fac.name:
@@ -497,8 +511,16 @@ def b_final_commit(request, c_id):
 		score_list = TempTable.objects.filter(class_id=cla.class_id)
 		for rec in score_list:  # move score records to ScoreTable
 			ScoreTable.objects.create(class_id=rec.class_id,
-									  student_id=rec.student_id,
-									  score=rec.score)
+										student_id=rec.student_id,
+										score=rec.score)
+			if rec.score >= 60:
+				new_state = 1
+			else:
+				new_state = -1
+			# should be update() not update_or_create, but right now the database is incomplete
+			Scheme_info.objects.update_or_create(course_id=rec.class_id.course_id, student_id=rec.student_id, state=new_state)
+			print("state updated to " + str(new_state))
+
 		TempTable.objects.filter(class_id=cla.class_id).delete()
 		return HttpResponse(u'提交成功！')
 
@@ -530,8 +552,7 @@ def db_scheme_info_query(s_id):
 
 def b_query_scheme_info(request):
 	student_id = request.user.username
-	return HttpResponse(json.dumps(db_scheme_info_query(student_id)),
-						content_type="application/json")
+	return HttpResponse(json.dumps(db_scheme_info_query(student_id)), content_type="application/json")
 
 
 from django.shortcuts import render, render_to_response
@@ -590,7 +611,8 @@ def upload_xlsx(request, c_id):
 		uf = XlsxForm()
 
 	return render_to_response('score_commit.html', {'uf': uf})
-	# return render(request, 'score_commit.html')
+
+# return render(request, 'score_commit.html')
 
 
 import random
@@ -649,11 +671,13 @@ def class_info_online_edit(request, course_id):
 
 	return db_temp_table_query(course_id)
 
+
 def b_online_save(request, s_id, c_id):
 	new_score = request.POST['newScore']
 
 	temp_table_update(c_id, [{'studentID': s_id, 'score': new_score}])
 	return HttpResponse('修改成功')
+
 
 def class_info_online_save(course_id, scores):
 	"""
@@ -669,6 +693,7 @@ def class_info_online_save(course_id, scores):
 
 	temp_table_update(course_id, scores)
 
+
 def get_scheme_info(request):
 	"""
 	:return: json of list in form of {studentID,studentName,courseId,courseName,credits,status}
@@ -683,7 +708,7 @@ def get_credit_info(request):
 	"""
 	Get the student's credit info (修读，未修，重修）
 	:param request:
-	:return:
+	:return: {'complete': complete_credit, 'incomplete': incomplete_credit, 're': re_credit}
 	"""
 
 	student_id = request.user.username
@@ -704,5 +729,3 @@ def get_credit_info(request):
 
 	result = {'complete': complete_credit, 'incomplete': incomplete_credit, 're': re_credit}
 	return HttpResponse(json.dumps(result), content_type="application/json")
-
-

@@ -101,6 +101,7 @@ class TempTable(models.Model):
 
 
 class MessageTable(models.Model):
+    message_id = models.CharField(max_length=50)
     from_faculty_id = models.ForeignKey(Faculty_user, related_name='%(class)s_from')
     to_faculty_id = models.ForeignKey(Faculty_user, related_name='%(class)s_to')
     student_id = models.ForeignKey(Student_user)
@@ -111,7 +112,7 @@ class MessageTable(models.Model):
     status = models.IntegerField(default=0)
 
     class Meta:
-        ordering = ["from_faculty_id"]
+        ordering = ["message_id"]
 
     def __str__(self):
         return 'message on student %s, from faculty %s to %s' \
@@ -137,7 +138,11 @@ class User(models.Model):
 
 #This class should be get from group of "Choose course"
 class Scheme_info(models.Model):
-    id = models.CharField(max_length=50,primary_key=True)
+    """
+    | class_id | course_id | state |
+    |---|---|---|
+    | CHARACTER(10) | CHARACTER(8) |  {-2,-1,0,1,2} |
+    """
     student_id = models.ForeignKey(Student_user)
     course_id = models.ForeignKey(Course_info,related_name='scheme_course')
     state = models.IntegerField(default=0)

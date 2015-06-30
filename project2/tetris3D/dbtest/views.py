@@ -351,7 +351,7 @@ class ModifyForm(forms.Form):
 	modifyReason = forms.DateField()
 
 
-def B_score_modification(request, c_id, s_id):
+def B_score_modification(request, m_id, c_id, s_id):
 	print("B_score_modification")
 	score = request.POST['newScore']
 	reason = request.POST['modifyReason']
@@ -360,11 +360,11 @@ def B_score_modification(request, c_id, s_id):
 	# mf = ModifyForm(request.POST)
 	# print(mf.is_valid())
 	# print(mf)
-	b_score_modification(c_id, s_id, score, reason)
+	b_score_modification(m_id, c_id, s_id, score, reason)
 	return HttpResponse("上传成功")
 
 
-def b_score_modification(c_id, s_id, score, reason):
+def b_score_modification(m_id, c_id, s_id, score, reason):
 	"""
 
 	:param c_id: class_id
@@ -394,7 +394,8 @@ def b_score_modification(c_id, s_id, score, reason):
 		to_fac = Faculty_user.objects.filter(name=info.teacher).first()
 		if to_fac.id == from_fac.id:
 			continue
-		update_message = MessageTable.objects.create(from_faculty_id=from_fac,
+		update_message = MessageTable.objects.create(message_id=m_id,
+													 from_faculty_id=from_fac,
 													 to_faculty_id=to_fac,
 													 student_id=stu, class_id=cla,
 													 old_score=old_score, new_score=score,
@@ -469,10 +470,10 @@ def b_query_modify_info(request):
 						content_type="application/json")
 
 
-def b_sanction_result(requst, msg_id, status):
+def b_sanction(requst, msg_id, status):
 	"""
 	To update the message status, usually making it True
-	:param msg_id: messageID in the MessageTable
+	:param msg_id: Identify(Primary key) in the MessageTable
 	:param status: how the status changes
 	:return: if_succeeded as an HttpResponse object
 	"""
@@ -480,20 +481,45 @@ def b_sanction_result(requst, msg_id, status):
 		print(status)
 		l = MessageTable.objects.get(id=msg_id)
 		if status == '1':
-			l.status = 2
+			l.status = 1
 			l.save()  # update status as 'admitted'
+			#rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
+			#								student_id=l.student_id.id).first()
+			#rec.score = l.new_score
+			#rec.save()  # change score
+			return HttpResponse(u'审核成功，您的意见是同意')
+		elif status == '0':
+			l.status = -1
+			l.save()  # update status as 'rejected'
+			return HttpResponse(u'审核成功，您的意见是不同意')
+	except:
+		return HttpResponse(u'非法记录号')
+
+def b_sanction_result(request, msd_id):
+	"""
+	To update the message status, usually making it True
+	:param msg_id: messageID in the MessageTable
+	:return: if_succeeded as an HttpResponse object
+	"""
+	try:
+		print(status)
+		l=ck[0]
+		Check_list = MessageTable.objects.filter(message_id=msg_id)
+		count=0
+		for ck in Check_list:
+			if (ck.status>0):
+				count+=1
+		if count>len(Check_list):
 			rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
 											student_id=l.student_id.id).first()
 			rec.score = l.new_score
 			rec.save()  # change score
-			return HttpResponse(u'审核成功，成绩将被修改')
-		elif status == '0':
-			l.status = 1
-			l.save()  # update status as 'rejected'
-			return HttpResponse(u'审核成功，成绩不同意被修改')
+
+			return HttpResponse(u'审核通过')
+		else:
+			return HttpResponse(u'审核不通过')
 	except:
 		return HttpResponse(u'非法记录号')
-
 
 def b_final_commit(request, c_id):
 	"""

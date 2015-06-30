@@ -44,10 +44,11 @@
             <table class="table table-hover" >
                 <thead>
                     <tr>
+                        <th>开课学院</th>
                         <th>课程代码</th>
                         <th>课程名称</th>
                         <th>学分</th>
-                        <th>成绩</th>
+                        <th>修读时间</th>
                         <th>修读状态</th>
                     </tr>
                 </thead>
@@ -63,7 +64,7 @@
 
     d3.json('/SM/B_scheme_info',function(data){   // retrieve all the score information of logined student
 //        var values = data.map(function(d){return d.score;});
-//        updateTable(data);  // call funttion to update the student scores
+        updateTable(data);  // call funttion to update the student scores
         console.log(data);
        // updateInfo(data,values);    // call function to update its statistical information
 
@@ -80,6 +81,27 @@ function generateIcon(status){    // generate the icons for each state of modifi
     }
 }
 
+function getSemester(semester){    // generate the icons for each state of modification request
+    switch(semester){
+        case 1:
+            return '大一秋冬';
+        case 2:
+            return '大一春夏';
+        case 3:
+            return '大二秋冬';
+        case 4:
+            return '大二春夏';
+        case 5:
+            return '大三秋冬';
+        case 6:
+            return '大三春夏';
+        case 7:
+            return '大四秋冬';
+        case 8:
+            return '大四春夏';
+    }
+}
+
 function updateTable(data) { // update student's transcript 
     d3.select("#scoreTable").selectAll("tr").remove();
     d3.select("#scoreTable").selectAll("tr")
@@ -87,11 +109,12 @@ function updateTable(data) { // update student's transcript
         .enter().append("tr")
         .html(function (d) {
         str = '';
-        str += "<td>" + d.courseID + "</td>";   // 课程号
-        str += "<td>" + d.courseName + "</td>";     // 课程名称
-        str += "<td>" + d.credit + "</td>"; // 学分
-        str += "<td>" + d.score + "</td>"; // 绩点
-        str += "<td>" + generateIcon(0) + "</td>"; // 绩点
+        str += "<td>" + d.courseCollege + "</td>";   // 开课学院
+        str += "<td>" + d.courseId + "</td>";     // 课程代码
+        str += "<td>" + d.courseName + "</td>"; // 课程名称
+        str += "<td>" + d.credits + "</td>"; // 学分
+        str += "<td>" + getSemester(d.courseSemester) + "</td>"; // 修读学期
+        str += "<td>" + generateIcon(d.state) + "</td>"; // 修读状态
         return str;
     });
 }

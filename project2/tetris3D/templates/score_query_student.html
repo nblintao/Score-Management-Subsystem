@@ -80,6 +80,7 @@ path {
                     <tr>
                         <th>课程代码</th>
                         <th>课程名称</th>
+                        <th>学期</th>
                         <th>成绩</th>
                         <th>学分</th>
                         <th>绩点</th>
@@ -146,6 +147,27 @@ function calcTermGPA(data){
 
 }
 
+function getSemester(semester){    // generate the icons for each state of modification request
+    switch(semester){
+        case 1:
+            return '2012-2013秋冬';
+        case 2:
+            return '2012-2013春夏';
+        case 3:
+            return '2013-2014秋冬';
+        case 4:
+            return '2013-2014春夏';
+        case 5:
+            return '2014-2015秋冬';
+        case 6:
+            return '2014-2015春夏';
+        case 7:
+            return '2015-2016秋冬';
+        case 8:
+            return '2015-2016大四春夏';
+    }
+}
+
 function updateInfo(data,values){   //update the student scores
     var info = [];
     var totalCredit = 0, totalGradePoint = 0;
@@ -208,6 +230,7 @@ function updateTable(data) { // update student's transcript
         str = '';
         str += "<td>" + d.courseID + "</td>";   // 课程号
         str += "<td>" + d.courseName + "</td>";     // 课程名称
+        str += "<td>" + getSemester(d.semester) + "</td>"; //学期
         str += "<td>" + d.score + "</td>";  // 成绩
         str += "<td>" + d.credit + "</td>"; // 学分
         str += "<td>" + d.gradePoint + "</td>"; // 绩点

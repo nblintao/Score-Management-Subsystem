@@ -72,12 +72,16 @@
 
 function generateIcon(status){    // generate the icons for each state of modification request
     switch(status){
-        case 1:
-            return '<span class="label label-success">正在修读</span>';
-        case -1:
-            return '<span class="label label-danger">重修</span>';
         case 0:
-            return '<span class="label label-info">未修</span>';
+            return '<span class="label label-warning">未修读</span>';
+        case 1:
+            return '<span class="label label-success">已修读</span>';
+        case 2:
+            return '<span class="label label-info">正在修读</span>';
+        case -1:
+            return '<span class="label label-danger">重修（已修读）</span>';
+        case -2:
+            return '<span class="label label-danger">重修（正在修读）</span>';
     }
 }
 

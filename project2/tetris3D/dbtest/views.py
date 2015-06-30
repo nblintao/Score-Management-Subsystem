@@ -392,6 +392,8 @@ def b_score_modification(c_id, s_id, score, reason):
 	teacher_of_course = Class_info.objects.filter(course_id=cla.course_id)
 	for info in teacher_of_course:
 		to_fac = Faculty_user.objects.filter(name=info.teacher).first()
+		if to_fac.id == from_fac.id:
+			continue
 		update_message = MessageTable.objects.create(from_faculty_id=from_fac,
 													 to_faculty_id=to_fac,
 													 student_id=stu, class_id=cla,

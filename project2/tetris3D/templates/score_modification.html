@@ -204,7 +204,7 @@ d3.json("B_query_modify_info",function(data){   // retrieve modification request
     // addModifyInfoTable(data[0], 'modify');
     // // audit_list
     // addModifyInfoTable(data[1], 'audit');
-    modifyData = data[0].map(function(d){d.type='modify';return d;});   // 发出请求的反馈结果
+	modifyData = data[0].map(function(d){d.type='modify';return d;});   // 发出请求的反馈结果
     auditData = data[1].map(function(d){d.type='audit';return d;}); // 审核别人的请求
     data = modifyData.concat(auditData);
     console.log(data);
@@ -243,6 +243,10 @@ function generateIcon(mess){    // generate the icons for each state of modifica
                 return '<span class="label label-success">审核通过（我审的）</span>';
             case 'reject':
                 return '<span class="label label-danger">审核不通过（我审的）</span>';
+			case 'final_admit':
+				return '<span class="label label-success">审核通过</span>';
+			case 'final_reject':
+				return '<span class="label label-danger">审核不通过</span>';
             case 'pending':
                 var url = "B_sanction_result/"+mess.messageID+"/";
                 return '<a href="'+url+'1"><button type="button" class="btn btn-success">同意</button></a><a href="'+url+'0"><button type="button" class="btn btn-danger">反对</button>';

@@ -72,7 +72,7 @@ def score_login(request):
 
 @login_required(login_url='/SM/login/')
 def score_logout(request):
-	logout(request);
+	logout(request)
 	return HttpResponseRedirect('/SM/login')
 
 
@@ -483,6 +483,10 @@ def db_query_modify_info(faculty_id):
 			tmp_status = 'reject'
 		elif rec.status == 1:
 			tmp_status = 'admit'
+		elif rec.status > 1:
+			tmp_status = 'final_admit'
+		elif rec.status < -1:
+			tmp_status = 'final_reject'
 		temp_node = {
 			'messageID': rec.message_id,
 			'className': rec.class_id.course_id.name,
@@ -510,7 +514,7 @@ def b_query_modify_info(request):
 						content_type="application/json")
 
 
-def b_sanction(requst, msg_id, status):
+def b_sanction(request, msg_id, status):
 	"""
 	To update the message status, usually making it True
 	:param msg_id: Identify(Primary key) in the MessageTable
@@ -518,10 +522,18 @@ def b_sanction(requst, msg_id, status):
 	:return: if_succeeded as an HttpResponse object
 	"""
 	print('b_sanction')
+	print(msg_id)
+
+	my_id = request.user.username
+	print ('my_id: {}'.format(my_id))
+
 	try:
 		print(status)
-		l = MessageTable.objects.get(id=msg_id)
+		l = MessageTable.objects.get(message_id=msg_id, to_faculty_id=my_id)
+		print('tag')
 		if status == '1':
+			print('agree')
+
 			l.status = 1
 			l.save()  # update status as 'admitted'
 			# rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
@@ -531,6 +543,7 @@ def b_sanction(requst, msg_id, status):
 			check_msg_status(msg_id)
 			return HttpResponse(u'审核成功，您的意见是同意')
 		elif status == '0':
+			print('disagree')
 			l.status = -1
 			l.save()  # update status as 'rejected'
 			check_msg_status(msg_id)
@@ -553,7 +566,7 @@ def check_msg_status(message_id):
 	:return:
 	"""
 	print('checking msg status')
-	msg_list = MessageTable.objects.filter(id=message_id)
+	msg_list = MessageTable.objects.filter(message_id=message_id)
 	print('filtering id {}'.format(message_id))
 
 	admitted_count = 0
@@ -578,18 +591,13 @@ def check_msg_status(message_id):
 		for row in msg_list:
 			row.status = 2
 			row.save()
-		# TODO, not right
-		return 'admit'
 	elif faculty_cnt - rejected_count < 2:
 		# never able to admit
 		print('msg id {} is rejected'.format(message_id))
 		for row in msg_list:
 			row.status = -2
-		# TODO, not right
-		return 'reject'
 	else:
 		print('msg id {} is pending'.format(message_id))
-		return 'pending'
 
 
 def b_sanction_result(request, msg_id):

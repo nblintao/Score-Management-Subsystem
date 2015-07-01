@@ -525,7 +525,7 @@ def b_sanction(request, msg_id, status):
 	print(msg_id)
 
 	my_id = request.user.username
-	print ('my_id: {}'.format(my_id))
+	print('my_id: {}'.format(my_id))
 
 	try:
 		print(status)
@@ -582,15 +582,14 @@ def check_msg_status(message_id):
 
 	faculty_cnt = count_faculty_of_course(course_id)
 
-	# raise Http404()
-	# print("faculty cnt {}; admitted_count {};".format(faculty_cnt, len(msg_list)))
-
 	if (faculty_cnt < 3 and admitted_count >= faculty_cnt - 1) or (faculty_cnt >= 3 and admitted_count >= 2):
 		# admit
 		print('msg id {} is admitted'.format(message_id))
 		for row in msg_list:
 			row.status = 2
 			row.save()
+		save_new_mod_score(message_id)
+
 	elif (faculty_cnt > 3 and faculty_cnt - 1 - rejected_count < 2) or (faculty_cnt <= 3 and rejected_count >= 1):
 		# never able to admit
 		print('msg id {} is rejected'.format(message_id))
@@ -599,6 +598,14 @@ def check_msg_status(message_id):
 			row.save()
 	else:
 		print('msg id {} is pending'.format(message_id))
+
+
+def save_new_mod_score(message_id):
+	msg = MessageTable.objects.filter(message_id=message_id).first()
+
+	stu_score = ScoreTable.objects.filter(class_id=msg.class_id, student_id=msg.student_id).first()
+	stu_score.score = msg.new_score
+	stu_score.save()
 
 
 def b_sanction_result(request, msg_id):

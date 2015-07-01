@@ -591,7 +591,7 @@ def check_msg_status(message_id):
 		for row in msg_list:
 			row.status = 2
 			row.save()
-	elif faculty_cnt - 1 - rejected_count < 2:
+	elif (faculty_cnt > 3 and faculty_cnt - 1 - rejected_count < 2) or (faculty_cnt <= 3 and rejected_count >= 1):
 		# never able to admit
 		print('msg id {} is rejected'.format(message_id))
 		for row in msg_list:

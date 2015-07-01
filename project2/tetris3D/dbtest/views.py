@@ -420,12 +420,21 @@ def db_query_modify_info(faculty_id):
 	:return: list in form of {messageID, className, studentID, studentName, old_score,
 								new_score, reason, status}
 	"""
+
 	modify_list = MessageTable.objects.filter(from_faculty_id=faculty_id)
 	audit_list = MessageTable.objects.filter(to_faculty_id=faculty_id)
 	ret = []
 	modify_node = []
 	audit_node = []
+
+	last_msg_id = -1
 	for rec in modify_list:
+		# show only one row of a msg(with same msg_id), not the best way
+		if rec.message_id == last_msg_id:
+			continue
+		else:
+			last_msg_id = rec.message_id
+
 		if rec.status == 0:  # prevent malicious hacking in js level
 			tmp_status = 'pending'
 		elif rec.status == 1:
@@ -433,7 +442,7 @@ def db_query_modify_info(faculty_id):
 		else:
 			tmp_status = 'admit'
 		temp_node = {  # generate node
-					   'messageID': rec.id,
+					   'messageID': rec.message_id,
 					   'className': rec.class_id.course_id.name,
 					   'studentID': rec.student_id.id,
 					   'studentName': rec.student_id.name,

@@ -504,16 +504,15 @@ def b_sanction(requst, msg_id, status):
 	except:
 		return HttpResponse(u'非法记录号')
 
-def b_sanction_result(request, msd_id):
+def b_sanction_result(request, msg_id):
 	"""
 	To update the message status, usually making it True
 	:param msg_id: messageID in the MessageTable
 	:return: if_succeeded as an HttpResponse object
 	"""
 	try:
-		print(status)
-		l=ck[0]
 		Check_list = MessageTable.objects.filter(message_id=msg_id)
+		l=Check_list[0]
 		count=0
 		for ck in Check_list:
 			if (ck.status>0):

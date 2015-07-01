@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- 
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import Context, loader
 from django import forms
 from .models import ScoreTable, TempTable, MessageTable, \
@@ -378,7 +378,7 @@ def b_score_modification(c_id, s_id, score, reason):
 	stu = Student_user.objects.get(id=s_id)  # get student_user object
 	from_fac = Faculty_user.objects.filter(name=cla.teacher).first()
 	s = ScoreTable.objects.filter(class_id=c_id, student_id=s_id).first()
-	print(s.score)
+	print('new score {}'.format(s.score))
 	print(s.class_id)
 	print(s.student_id)
 	old_score = s.score
@@ -391,16 +391,38 @@ def b_score_modification(c_id, s_id, score, reason):
 	# 											 reason=reason, status=0)
 
 	top_msg_id = 0
-	all_rows = MessageTable.objects.all()
+	all_rows = MessageTable.objects.filter()
 	for row in all_rows:
-		if row.message_id > top_msg_id:
-			top_msg_id = row.message_id
+		print('old msg id {} found'.format(row.message_id))
+		if int(row.message_id) > top_msg_id:
+			top_msg_id = int(row.message_id)
 
 	top_msg_id += 1
+	print('new msg id {}'.format(top_msg_id))
 
 	teacher_of_course = Class_info.objects.filter(course_id=cla.course_id)
+	print('teacher of the course {} is {}'.format(cla.course_id, len(teacher_of_course)))
+
+	if count_faculty_of_course(cla.course_id) == 1:
+		# TODO: no verified
+		# get this score and update and save it
+		score_row = ScoreTable.objects.get(class_id=c_id, student_id=s_id)
+		score_row.score = score
+		score_row.save()
+
+		null_faculty_id = Faculty_user()
+		update_message = MessageTable.objects.create(message_id=top_msg_id,
+													 from_faculty_id=from_fac,
+													 to_faculty_id=null_faculty_id,
+													 student_id=stu, class_id=cla,
+													 old_score=old_score, new_score=score,
+													 reason=reason, status=2)
+		print(update_message)
+		return
+
 	for info in teacher_of_course:
 		to_fac = Faculty_user.objects.filter(name=info.teacher).first()
+		#
 		if to_fac.id == from_fac.id:
 			continue
 		update_message = MessageTable.objects.create(message_id=top_msg_id,
@@ -410,12 +432,12 @@ def b_score_modification(c_id, s_id, score, reason):
 													 old_score=old_score, new_score=score,
 													 reason=reason, status=0)
 		print(update_message)
-
+	print('after update_message')
 
 
 def db_query_modify_info(faculty_id):
 	"""
-	Query the MessageTable of records for and from the faculty
+	Query the MessageTable of records for and from the faculty22
 	:param faculty_id: as the title
 	:return: list in form of {messageID, className, studentID, studentName, old_score,
 								new_score, reason, status}
@@ -435,12 +457,12 @@ def db_query_modify_info(faculty_id):
 		else:
 			last_msg_id = rec.message_id
 
-		if rec.status == 0:  # prevent malicious hacking in js level
-			tmp_status = 'pending'
-		elif rec.status == 1:
+		if rec.status > 1:  # prevent malicious hacking in js level
+			tmp_status = 'admit'
+		elif rec.status < -1:
 			tmp_status = 'reject'
 		else:
-			tmp_status = 'admit'
+			tmp_status = 'pending'
 		temp_node = {  # generate node
 					   'messageID': rec.message_id,
 					   'className': rec.class_id.course_id.name,
@@ -457,12 +479,12 @@ def db_query_modify_info(faculty_id):
 	for rec in audit_list:
 		if rec.status == 0:
 			tmp_status = 'pending'
-		elif rec.status == 1:
+		elif rec.status == -1:
 			tmp_status = 'reject'
-		else:
+		elif rec.status == 1:
 			tmp_status = 'admit'
 		temp_node = {
-			'messageID': rec.id,
+			'messageID': rec.message_id,
 			'className': rec.class_id.course_id.name,
 			'studentID': rec.student_id.id,
 			'studentName': rec.student_id.name,
@@ -495,23 +517,80 @@ def b_sanction(requst, msg_id, status):
 	:param status: how the status changes
 	:return: if_succeeded as an HttpResponse object
 	"""
+	print('b_sanction')
 	try:
 		print(status)
 		l = MessageTable.objects.get(id=msg_id)
 		if status == '1':
 			l.status = 1
 			l.save()  # update status as 'admitted'
-			#rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
+			# rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
 			#								student_id=l.student_id.id).first()
-			#rec.score = l.new_score
-			#rec.save()  # change score
+			# rec.score = l.new_score
+			# rec.save()  # change score
+			check_msg_status(msg_id)
 			return HttpResponse(u'审核成功，您的意见是同意')
 		elif status == '0':
 			l.status = -1
 			l.save()  # update status as 'rejected'
+			check_msg_status(msg_id)
 			return HttpResponse(u'审核成功，您的意见是不同意')
+
 	except:
 		return HttpResponse(u'非法记录号')
+
+
+def count_faculty_of_course(course_id):
+	return len(Class_info.objects.filter(course_id=course_id))
+
+
+def check_msg_status(message_id):
+	"""
+	NOTE that: status: -1 means this teacher reject it, 1 means this teacher accept it,
+	 					-2 means already rejected, >1 means already accept it.
+	 					0 means wait for teacher to accept/reject it.
+	:param message_id:
+	:return:
+	"""
+	print('checking msg status')
+	msg_list = MessageTable.objects.filter(id=message_id)
+	print('filtering id {}'.format(message_id))
+
+	admitted_count = 0
+	rejected_count = 0
+	for row in msg_list:
+		print(row.status)
+		if row.status == 1:
+			admitted_count += 1
+		elif row.status == -1:
+			rejected_count += 1
+
+	course_id = msg_list.first().class_id.course_id
+
+	faculty_cnt = count_faculty_of_course(course_id)
+
+	# raise Http404()
+	# print("faculty cnt {}; admitted_count {};".format(faculty_cnt, len(msg_list)))
+
+	if (faculty_cnt < 3 and admitted_count >= faculty_cnt - 1) or (faculty_cnt >= 3 and admitted_count >= 2):
+		# admit
+		print('msg id {} is admitted'.format(message_id))
+		for row in msg_list:
+			row.status = 2
+			row.save()
+		# TODO, not right
+		return 'admit'
+	elif faculty_cnt - rejected_count < 2:
+		# never able to admit
+		print('msg id {} is rejected'.format(message_id))
+		for row in msg_list:
+			row.status = -2
+		# TODO, not right
+		return 'reject'
+	else:
+		print('msg id {} is pending'.format(message_id))
+		return 'pending'
+
 
 def b_sanction_result(request, msg_id):
 	"""
@@ -521,12 +600,12 @@ def b_sanction_result(request, msg_id):
 	"""
 	try:
 		Check_list = MessageTable.objects.filter(message_id=msg_id)
-		l=Check_list[0]
-		count=0
+		l = Check_list[0]
+		count = 0
 		for ck in Check_list:
-			if (ck.status>0):
-				count+=1
-		if count>len(Check_list):
+			if (ck.status > 0):
+				count += 1
+		if count > len(Check_list):
 			rec = ScoreTable.objects.filter(class_id=l.class_id.class_id,
 											student_id=l.student_id.id).first()
 			rec.score = l.new_score
@@ -537,6 +616,7 @@ def b_sanction_result(request, msg_id):
 			return HttpResponse(u'审核不通过')
 	except:
 		return HttpResponse(u'非法记录号')
+
 
 def b_final_commit(request, c_id):
 	"""
@@ -556,14 +636,15 @@ def b_final_commit(request, c_id):
 		score_list = TempTable.objects.filter(class_id=cla.class_id)
 		for rec in score_list:  # move score records to ScoreTable
 			ScoreTable.objects.create(class_id=rec.class_id,
-										student_id=rec.student_id,
-										score=rec.score)
+									  student_id=rec.student_id,
+									  score=rec.score)
 			if rec.score >= 60:
 				new_state = 1
 			else:
 				new_state = -1
 			# should be update() not update_or_create, but right now the database is incomplete
-			Scheme_info.objects.update_or_create(course_id=rec.class_id.course_id, student_id=rec.student_id, state=new_state)
+			Scheme_info.objects.update_or_create(course_id=rec.class_id.course_id, student_id=rec.student_id,
+												 state=new_state)
 			print("state updated to " + str(new_state))
 
 		TempTable.objects.filter(class_id=cla.class_id).delete()

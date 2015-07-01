@@ -351,7 +351,7 @@ class ModifyForm(forms.Form):
 	modifyReason = forms.DateField()
 
 
-def B_score_modification(request, m_id, c_id, s_id):
+def B_score_modification(request, c_id, s_id):
 	print("B_score_modification")
 	score = request.POST['newScore']
 	reason = request.POST['modifyReason']
@@ -360,11 +360,11 @@ def B_score_modification(request, m_id, c_id, s_id):
 	# mf = ModifyForm(request.POST)
 	# print(mf.is_valid())
 	# print(mf)
-	b_score_modification(m_id, c_id, s_id, score, reason)
+	b_score_modification(c_id, s_id, score, reason)
 	return HttpResponse("上传成功")
 
 
-def b_score_modification(m_id, c_id, s_id, score, reason):
+def b_score_modification(c_id, s_id, score, reason):
 	"""
 
 	:param c_id: class_id
@@ -373,6 +373,7 @@ def b_score_modification(m_id, c_id, s_id, score, reason):
 	:param reason:
 	:return:
 	"""
+
 	cla = Class_info.objects.get(class_id=c_id)  # get class_info object
 	stu = Student_user.objects.get(id=s_id)  # get student_user object
 	from_fac = Faculty_user.objects.filter(name=cla.teacher).first()
@@ -389,19 +390,27 @@ def b_score_modification(m_id, c_id, s_id, score, reason):
 	# 											 old_score=old_score, new_score=score,
 	# 											 reason=reason, status=0)
 
+	top_msg_id = 0
+	all_rows = MessageTable.objects.all()
+	for row in all_rows:
+		if row.message_id > top_msg_id:
+			top_msg_id = row.message_id
+
+	top_msg_id += 1
+
 	teacher_of_course = Class_info.objects.filter(course_id=cla.course_id)
 	for info in teacher_of_course:
 		to_fac = Faculty_user.objects.filter(name=info.teacher).first()
 		if to_fac.id == from_fac.id:
 			continue
-		update_message = MessageTable.objects.create(message_id=m_id,
+		update_message = MessageTable.objects.create(message_id=top_msg_id,
 													 from_faculty_id=from_fac,
 													 to_faculty_id=to_fac,
 													 student_id=stu, class_id=cla,
 													 old_score=old_score, new_score=score,
 													 reason=reason, status=0)
-
 		print(update_message)
+
 
 
 def db_query_modify_info(faculty_id):

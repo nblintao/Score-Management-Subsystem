@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>{{alert_info}}</title>
+</head>
+<body>
+<h1>
+{{ alert_info }}
+</h1>
+<h2>
+    <p>
+        <a href="{{ refresh_url }}">
+            两秒钟后将跳转，如果长时间没有响应请直接点击
+        </a>
+    </p>
+</h2>
+<meta http-equiv="refresh" content="2;url={{ refresh_url }}">
+</body>
+</script>

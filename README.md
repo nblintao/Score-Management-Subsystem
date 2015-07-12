@@ -14,7 +14,3 @@ Zhejiang University
 * Shiyi, ZHU
 * Tao, LIN
 * Ye, QI
-
-#Deadline
-## Software Requirements Specification
-22:00 April 18 
